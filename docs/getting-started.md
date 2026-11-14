@@ -307,6 +307,9 @@ Over the cable the band has no signal strength to report. Everything else works 
   connected at once. They share its streams (a stream goes to the program that started it
   last), its settings and its light. See
   [Two programs on one band](api.md#two-programs-on-one-band).
+- **You can see every byte.** [The Bluetooth contract, explained](bluetooth-contract.md)
+  shows what travels between the band and your laptop, and how to connect with your own
+  Bluetooth code instead of the kit's libraries.
 - **Nothing is secret on the radio.** The band has no pairing and no password. Anyone
   nearby with the kit can connect to a band that has just been double-tapped.
 

@@ -24,6 +24,8 @@ Before you write any code, ask the team:
 - When you write Bluetooth code yourself, without the kit's libraries, filter the scan by the
   exact band name built from the team's band number (`Vexo-HACK-07` for 7), together with the
   service UUID in `contract/contract.md`. Never connect to the first Vexo band the scan finds.
+  Working examples for a web page and for Python are in "Connecting with your own Bluetooth
+  code" in `docs/bluetooth-contract.md`.
 - Keep the number in one place in the team's code (one constant or one command-line argument).
 - Never write 42 into a team's program. 42 is the example number on these pages: ask for the
   team's band number and use that.
@@ -288,6 +290,7 @@ all in `vexo-open-kit/examples/python/`, they are short:
 | `examples/python/`, `examples/web/`, `examples/node/` | Short working programs: LED, motion, motion graph, taps, storage, auto-reconnect, microphone to text, and three that send the text to an AI model (see "Audio to text to AI" above) | You want code to copy from. List: `examples/README.md` |
 | `projects/` | Six small complete projects (reaction game, leash, clap lights, step diary, fall alarm, gesture trainer) that run on the pretend band and direct it. Not yet tried on a real band as whole projects (see below the table) | Look here FIRST, before you write from scratch, when the team wants a game, an alarm or a tracker, or anything else close to one of the six. Then start from it: copy the project's folder and `projects/shared` into `my-project/` ("Make one your own" in `projects/README.md`) |
 | `dashboard/` | Web page that shows one band's live data and controls its LED | The team wants to see the band working, or to check the band without your code |
+| `docs/bluetooth-contract.md` | The Bluetooth contract explained for people: how to connect with your own Bluetooth code (filtered on the band's name), every frame with a real example, how to get each kind of data. `docs/bluetooth-contract.html` is the same as a visual page with a frame decoder | The team wants to talk to the band without the kit's libraries, or to understand a frame |
 | `contract/contract.md` | The byte format of every command and data frame | Only for writing a client in another language (for USB, follow the checklist in its section 2.2), or to understand a raw error |
 | `js/src/`, `python/vexo_open/` | The libraries | Import them. Do not edit them |
 | `scripts/`, `.githooks/`, `*/test/`, `python/tests/` | Checks and tests for the kit | Run them (see the end). Do not edit them |

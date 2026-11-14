@@ -25,9 +25,11 @@ import unittest
 KIT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NODE = shutil.which("node")
 PAGES = ["README.md", "AGENTS.md", "docs/getting-started.md", "docs/api.md", "docs/speech.md", "docs/deepgram.md", "examples/README.md",
+         "docs/bluetooth-contract.md",
          "contract/README.md", "contract/contract.md"]
 # the pages a student (or a student's AI agent) works from
 STUDENT_PAGES = ["README.md", "AGENTS.md", "docs/getting-started.md", "docs/api.md", "docs/speech.md", "docs/deepgram.md",
+                 "docs/bluetooth-contract.md",
                  "examples/README.md"]
 SIM = 'transport="sim"'
 VOICE = "dashboard/speech/sample-speech.opus"     # the recording the pages name as the pretend band's voice
@@ -1027,7 +1029,7 @@ class Wording(unittest.TestCase):
     def test_42_is_called_an_example_at_the_top_of_every_page_with_commands(self):
         flat = lambda page: re.sub(r"\s+", " ", read(page).replace("\n> ", " "))
         for page in ("README.md", "docs/getting-started.md", "examples/README.md", "projects/README.md", "docs/deepgram.md",
-                     "docs/speech.md", "AGENTS.md"):
+                     "docs/speech.md", "AGENTS.md", "docs/bluetooth-contract.md"):
             self.assertIn("**42 is only our example. Wherever you see 42 in a command, an address or a name, type the number "
                           "written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address ends in `?band=7`.",
                           flat(page), page)

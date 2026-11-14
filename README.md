@@ -11,8 +11,8 @@ not your project.
   whatever you want with the band's motion, taps, light and microphone.
 - You may copy any file from here into your project (MIT licence).
 - You never need to change this repo or push to it.
-- You do not want the libraries at all? The contract ([contract/contract.md](contract/contract.md))
-  says how to talk to the band directly over Bluetooth.
+- You do not want the libraries at all? [The Bluetooth contract, explained](docs/bluetooth-contract.md)
+  says how to talk to the band directly over Bluetooth, with every packet drawn out.
 
 ## The kit in short
 
@@ -88,6 +88,9 @@ The band talks to **one program at a time** over Bluetooth: close the dashboard 
 run a Python example, and the other way round. Before every connect, **double-tap the band**:
 it can then be found for 60 seconds.
 
+Want to know what travels between the band and your laptop, or write the Bluetooth part
+yourself? Read [The Bluetooth contract, explained](docs/bluetooth-contract.md).
+
 **You only ever connect to your own band.** `?band=42` at the end of the dashboard address
 makes the browser's list show only `Vexo-HACK-42`, so you cannot pick a neighbour's band by
 mistake. Without `?band=` the dashboard first asks you to type your number. In a program,
@@ -146,10 +149,10 @@ for it.
 | `projects/` | [Six small complete projects](projects/README.md): a reaction game, a leash, clap lights, a step diary, a fall alarm, a gesture trainer. | When you want a working starting point bigger than an example. Copy one folder into `my-project/` and make it yours. |
 | `python/` | The Python library (`vexo_open`): connect, motion, taps, light, microphone, storage, a pretend band. Bluetooth needs `bleak`, USB needs `pyserial`. | Your Python programs import it. You do not edit it. |
 | `js/` | The JavaScript library for web pages (Bluetooth and USB in Chrome and Edge) and a pretend band. No dependencies. | Your web pages import it. You do not edit it. |
-| `docs/` | [Getting started](docs/getting-started.md), the [library API](docs/api.md) (every call, both languages), [speech and raw sound](docs/speech.md), [using Deepgram with your band](docs/deepgram.md). | When you want to know how to do one thing, or what an error means. |
+| `docs/` | [Getting started](docs/getting-started.md), the [library API](docs/api.md) (every call, both languages), [speech and raw sound](docs/speech.md), [using Deepgram with your band](docs/deepgram.md), and [the Bluetooth contract, explained](docs/bluetooth-contract.md): how to connect with your own code, what every packet looks like and how to get each kind of data (also as a visual page, `docs/bluetooth-contract.html`). | When you want to know how to do one thing, or what an error means. |
 | `AGENTS.md` | [The guide for AI coding agents](AGENTS.md), and the key setup for people: "Audio to text to AI". | Point your coding agent at it before it writes anything. Read its key section yourself. |
 | `env.example` | An empty form for your team's two keys. | Copy it to `my-project/.env` and fill it in. That file stays on your computer. |
-| `contract/` | [`contract.md`](contract/contract.md): every command the band understands and every kind of data it sends, byte by byte, with test frames. | Only if you write your own library, in another language for example. |
+| `contract/` | [`contract.md`](contract/contract.md): every command the band understands and every kind of data it sends, byte by byte, with test frames. | Only if you write your own library, in another language for example. Read [the explained version](docs/bluetooth-contract.md) first. |
 | `scripts/`, `.githooks/` | The kit's own safety checks. | Maintainers only. |
 
 ## Tests
