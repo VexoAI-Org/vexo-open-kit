@@ -82,7 +82,7 @@ export function connectProblem(error, { kind, wanted }) {
       return usb
         ? 'No USB port was picked. Plug the band in with a data cable (not a charge-only one), then press Connect by USB cable again. '
           + 'On a Mac, the first time you plug a band in, macOS may ask "Allow accessory to connect?": press Allow, or no port shows up.'
-        : `No band was picked. Was ${wanted} not in the list? ${ELSEWHERE} Then double-tap ${wanted} to wake it, press Connect and pick it from the list.`;
+        : `No band was picked. Was ${wanted} not in the list? ${ELSEWHERE} Then double-tap ${wanted} to wake it, press Connect and pick it from the list. Still not there, and this band had another number before? Add &list=all to the address: the list then shows every band nearby, maybe under its old name, and the dashboard checks it is really ${wanted}.`;
     case 'not-found-nearby':
       return `Could not reach ${wanted}. ${ELSEWHERE} Then double-tap the band to wake it, keep it close, and press Connect again.`;
     case 'wrong-band': {

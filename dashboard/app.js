@@ -157,6 +157,12 @@ async function connect(kind) {
       pretend.onLed = showSimLed;
       transport = pretend;
     }
+    // ?list=all: the chooser lists every band nearby (for a computer that remembers this band under an
+    // old name). The library still checks the number after connecting and refuses another band.
+    if (kind === 'ble' && params.get('list') === 'all') {
+      transport = new WebBluetoothTransport(chosen.number);
+      transport.listAll = true;
+    }
     // For Bluetooth the library filters the chooser to this band's exact name and service.
     // autoReconnect: when the link drops, the library finds the band again by itself.
     connected = await Band.connect(chosen.number, { transport, autoReconnect: true });

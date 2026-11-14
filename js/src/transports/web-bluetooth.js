@@ -20,6 +20,12 @@ export class WebBluetoothTransport extends Transport {
   chooserSeconds = 120;
   /** Seconds to wait for the picked band to answer. */
   connectSeconds = 20;
+  /**
+   * true = the chooser lists every Vexo Open band nearby, not only the one with this band's name.
+   * For a computer that remembers a band under an old name (a band that got a new number): there the
+   * browser never shows it under the new name. The band's number is still checked after connecting.
+   */
+  listAll = false;
 
   /** @param {number|null} number band number; null = let the chooser list every Vexo Open band */
   constructor(number = null) {
@@ -52,7 +58,7 @@ export class WebBluetoothTransport extends Transport {
       // UUID), and only the one with this name when a number was given. The band sends the
       // service in its first packet and the name in its scan response; the browser puts the
       // two together before it compares them with this filter.
-      const filter = this.bandName ? { name: this.bandName, services: [SERVICE_UUID] } : { services: [SERVICE_UUID] };
+      const filter = this.bandName && !this.listAll ? { name: this.bandName, services: [SERVICE_UUID] } : { services: [SERVICE_UUID] };
       device = await within(
         navigator.bluetooth.requestDevice({ filters: [filter], optionalServices: [SERVICE_UUID] }),
         this.chooserSeconds,
