@@ -750,28 +750,20 @@ class Commands(unittest.TestCase):
         for command in listed:
             self.assertIn("Connected to Vexo-HACK-42", self.in_my_project(command))
 
-    def test_readme_one_minute(self):
-        text = section(read("README.md"), "Try it in one minute")
-        listed = commands(text)
-        self.assertEqual(len(listed), 2)
-        for command in listed:
-            self.assertIn("--sim", command)
-            self.assertTrue(self.in_my_project(command).strip())
-        # first the kit gets its home (the move), then the commands, then the server: all in my-project/
-        move = "    mkdir my-project\n    mv vexo-open-kit my-project/\n    cd my-project\n"
-        self.assertIn(move, text)
-        self.assertLess(text.index(move), text.index(listed[0]))
-        self.assertLess(text.index(listed[1]), text.index("-m http.server"))
-        self.assertIn("run `python3 -m http.server 8000 --bind 127.0.0.1` in `my-project/`, open\n"
-                      "<http://localhost:8000/vexo-open-kit/dashboard/?band=42>", text)
+    def test_readme_quick_start(self):
         whole = read("README.md")
-        self.assertLess(whole.index(move), whole.index("python3 "), "no command before the kit has its home")
-        # the move as printed, tried on a folder called vexo-open-kit
-        with tempfile.TemporaryDirectory() as downloads:
-            os.makedirs(os.path.join(downloads, "vexo-open-kit", "examples"))
-            for line in move.strip().split("\n")[:2]:
-                subprocess.run(shlex.split(line.strip()), cwd=downloads, check=True)
-            self.assertTrue(os.path.isdir(os.path.join(downloads, "my-project", "vexo-open-kit", "examples")))
+        setup = section(whole, "Set up")
+        home = "    mkdir my-project\n    cd my-project\n"
+        self.assertIn(home, setup)
+        # first the kit gets its home, then the commands: all typed in my-project/
+        self.assertLess(whole.index(home), whole.index("python3 "), "no command before the kit has its home")
+        connect = section(whole, "Connect your band")
+        self.assertIn("python3 -m http.server 8000 --bind 127.0.0.1", connect)
+        self.assertIn("<http://localhost:8000/vexo-open-kit/dashboard/?band=42>", connect)
+        self.assertIn("Double-tap the band", connect)
+        example = section(whole, "Run an example")
+        self.assertIn("python3 vexo-open-kit/examples/python/led.py --sim", example)
+        self.assertLess(len(whole.splitlines()), 140, "the README stays one short page")
 
     def test_getting_started_no_band_command(self):
         m = re.search(r"No band\? Run `([^`]+)`\. Nothing needs to be installed", read("docs/getting-started.md"))
@@ -838,7 +830,7 @@ class Commands(unittest.TestCase):
 
     def test_kit_test_commands_point_at_real_files(self):
         # these run the tests themselves, so here only: every path and pattern in them exists
-        for page, heading in (("AGENTS.md", "Check your work"), ("README.md", "Tests"), ("examples/README.md", "Examples")):
+        for page, heading in (("AGENTS.md", "Check your work"), ("CONTRIBUTING.md", "Tests"), ("examples/README.md", "Examples")):
             listed = [c for c in commands(section(read(page), heading)) if "test" in c]
             self.assertTrue(listed, page)
             # typed in the kit folder itself, and the page says so and for whom
@@ -1213,14 +1205,13 @@ class Wording(unittest.TestCase):
         self.assertIn("The library is not installed on your computer.", flat("docs/getting-started.md"))
         # one order on every page: first the folder my-project, then the kit goes inside it;
         # a kit that is there already is moved in
-        self.assertIn("The order is the same on every page: first the folder, then the kit goes inside it. No kit on your "
-                      "computer yet? Make a folder `my-project` and unpack or clone the kit inside it", flat("README.md"))
+        self.assertIn("Make a folder for your project and put the kit inside it", flat("README.md"))
         self.assertIn("First the folder, then the kit inside it. Make a new folder called `my-project`.", flat("docs/getting-started.md"))
         self.assertIn("If the kit is on your computer already, move the whole kit folder into `my-project`.", flat("docs/getting-started.md"))
         self.assertIn("The order is always the same: first the folder `my-project/`, then the kit goes inside it. No kit on the "
                       "computer yet: make `my-project/`, then clone or unpack the kit inside it.", flat("AGENTS.md"))
-        for page in ("README.md", "AGENTS.md"):
-            self.assertIn("    mkdir my-project\n    mv vexo-open-kit my-project/\n    cd my-project\n", read(page), page)
+        self.assertIn("    mkdir my-project\n    mv vexo-open-kit my-project/\n    cd my-project\n", read("AGENTS.md"))
+        self.assertIn("    mkdir my-project\n    cd my-project\n", read("README.md"))
 
     def test_node_examples_are_run_one_way_on_every_page(self):
         # on every page: no argument, or the band number 42 as with the Python examples
