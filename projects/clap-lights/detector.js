@@ -6,7 +6,7 @@
 // keep a slow-moving background level, and a clap is a reading that jumps far above it.
 // A steady loud room pulls the background up, so it stops counting after the first jump.
 
-// The numbers to tune. RISE_DB is measured on one band on a desk, 2026-11-12:
+// The numbers to tune. RISE_DB is measured on one band on a desk:
 //   a quiet room      peakDb about 43 (33 to 48); in one minute never more than 10 dB above the background
 //   loud clap-like bursts   peakDb 10 to 17, that is 26 to 32 dB above the background: all counted
 //   a steady tone that swells over half a second   18 dB above the background: not counted

@@ -53,6 +53,11 @@ Three rules:
 - **Connect only to your own band.** `?band=42` and `Band.connect(42)` look only for
   `Vexo-HACK-42`. If your band flashes white and it was not you, someone else has
   connected to it: restart it and tell a helper.
+  To restart a band by hand, press the small RESET button on the board once (once only:
+  two quick presses start the board's loader instead; press once more to get the band
+  back). A band with no battery also restarts when you unplug the USB cable and plug it
+  in again. After a restart the light blinks blue once a second for 60 seconds, or until
+  you connect.
 - **One program at a time.** Close the dashboard tab before you run a Python program, and
   the other way round.
 - **Double-tap before every connect.** No blue blink, no connection.

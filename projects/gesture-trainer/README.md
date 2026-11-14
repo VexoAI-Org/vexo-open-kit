@@ -31,7 +31,7 @@ why `--bind`: see [the list](../README.md#run-one)). If this server runs already
   the band: `Segmenter` cuts gestures out of the motion, `toShape` turns one into 24
   points, `match` finds the nearest recorded example. The numbers to tune are at its top (`MAX_SAMPLES` = 2000
   is the most samples one gesture keeps): guesses that fit the pretend hand, not tried on a real wrist. Measured
-  on one band on a desk, 2026-11-12: at rest it reads 2.2 to 2.4 degrees/second and steps of at most 0.005 g,
+  on one band on a desk: at rest it reads 2.2 to 2.4 degrees/second and steps of at most 0.005 g,
   far below `START_GYRO` (40) and `START_ACCEL` (0.08). A still hand and real gestures: not yet measured.
 - `trainer.js` (about 150 lines) is the page: `record`, `onGesture` and `draw`.
 - `motions.js` holds the pretend hand's motions, played with the kit's `pretend.playMotion(...)`. `../shared/page.js` connects.

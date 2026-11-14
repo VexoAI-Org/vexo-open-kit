@@ -18,7 +18,7 @@ export function bandNumber(text) {
     throw new Error('Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it.');
   }
   if (number === null) {
-    throw new Error(`"${typed}" is not a band number. Type just the number on your band or card, for example 42.`);
+    throw new Error(`"${typed}" is not a band number. Type just the number on your band or its bag, for example 42.`);
   }
   return number;
 }

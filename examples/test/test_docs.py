@@ -1159,23 +1159,19 @@ class Wording(unittest.TestCase):
         for example in ("examples/python/fast_motion.py", "examples/node/fast-motion.mjs"):
             self.assertIn("(../%s)" % example, section(api, "Fast motion"))
 
-    def test_a_real_band_with_firmware_1_1_every_page_says_the_same(self):
-        # What is true: on firmware 1.1.0 one real band passed on the test bench: fast motion
-        # (208, 416, 833; 1666 with acceleration only over USB), the clock, and intervals.
+    def test_event_bands_run_firmware_1_1_0_every_page_says_the_same(self):
+        # Every event band has firmware 1.1.0. The pages say that in one sentence, and say
+        # nothing about later firmware or about how the kit was tested.
         flat = lambda page: re.sub(r"\s+", " ", read(page))
-        self.assertIn("**Firmware 1.1 has passed on a real band on the test bench**, with firmware 1.1.0: fast motion at 208, "
-                      "416 and 833 samples per second (and 1666 with acceleration only over the USB cable), the clock, and "
-                      "intervals.", flat("docs/api.md"))
-        self.assertIn("All three 1.1 features have passed on a real band on the test bench, with firmware 1.1.0: fast motion "
-                      "(208, 416 and 833 samples per second, and 1666 with acceleration only over the USB cable), the clock, "
-                      "and intervals.", flat("AGENTS.md"))
-        self.assertIn("On firmware 1.1.0 a real band passed on the test bench: fast motion, the clock, and intervals",
-                      flat("docs/getting-started.md"))
-        for page in STUDENT_PAGES:
+        self.assertIn("Event bands run firmware 1.1.0.", flat("docs/api.md"))
+        self.assertIn("**Event bands run firmware 1.1.0.**", flat("AGENTS.md"))
+        self.assertIn("**Event bands run firmware 1.1.0.**", flat("docs/getting-started.md"))
+        self.assertIn("Event bands run firmware 1.1.0", flat("contract/contract.md"))
+        for page in PAGES:
             for old in ("not yet confirmed on a real band", "not yet been confirmed on a real band", "less testing there",
-                        "less testing on a real band", "not yet been run on a real band"):
+                        "less testing on a real band", "not yet been run on a real band", "test bench", "1.1.1", "1.1.2",
+                        "1.1.3", "## Revisions"):
                 self.assertNotIn(old, flat(page), page)
-        self.assertEqual(flat("docs/api.md").count("[passed on a real band on the test bench](#firmware-10-and-11)"), 2)
 
     def test_av_has_no_version_on_any_page(self):
         # One rule: the decoder on its own is `python3 -m pip install av`, no version, on every

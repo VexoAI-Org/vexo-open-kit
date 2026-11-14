@@ -1,5 +1,5 @@
 {
- "about": "Shared test vectors for Vexo Open clients, derived from contract.md. Every library must encode and decode these identically. All hex is lower case with no separators. In 'args', 'data' and stream values the fields 'opus' and 'value' are raw bytes written as hex; 'name' is ASCII text. encode: build the command frame from name + seq + args and compare with hex. decode: parse hex and compare with value. Each entry under 'invalid' must be rejected (decode returns nothing) without raising an error. Entries noted v1.1 need a band with proto_minor 1 or later; a v1.0 band answers those commands UNKNOWN_OPCODE.",
+ "about": "Shared test vectors for Vexo Open clients, derived from contract.md. Every library must encode and decode these identically. All hex is lower case with no separators. In 'args', 'data' and stream values the fields 'opus' and 'value' are raw bytes written as hex; 'name' is ASCII text. encode: build the command frame from name + seq + args and compare with hex. decode: parse hex and compare with value. Each entry under 'invalid' must be rejected (decode returns nothing) without raising an error.",
  "contract_revision": "2026-11-12",
  "name_prefix": "Vexo-HACK-",
  "uuids": {
@@ -369,15 +369,13 @@
    "args": {
     "unix_ms": 1794484800123
    },
-   "hex": "0132077b0aa1cfa1010000",
-   "note": "v1.1"
+   "hex": "0132077b0aa1cfa1010000"
   },
   {
    "name": "TIME_GET",
    "seq": 51,
    "args": {},
-   "hex": "013308",
-   "note": "v1.1"
+   "hex": "013308"
   },
   {
    "name": "STREAM_SET_INTERVAL",
@@ -387,7 +385,7 @@
     "interval_ms": 60000
    },
    "hex": "0134130460ea0000",
-   "note": "v1.1: battery every minute"
+   "note": "battery every minute"
   },
   {
    "name": "STREAM_SET_INTERVAL",
@@ -396,8 +394,7 @@
     "stream": 7,
     "interval_ms": 20
    },
-   "hex": "0135130714000000",
-   "note": "v1.1"
+   "hex": "0135130714000000"
   },
   {
    "name": "STREAM_GET_INTERVAL",
@@ -405,8 +402,7 @@
    "args": {
     "stream": 2
    },
-   "hex": "01361402",
-   "note": "v1.1"
+   "hex": "01361402"
   },
   {
    "name": "MOTION2_SET",
@@ -415,8 +411,7 @@
     "rate_hz": 416,
     "sensors": 1
    },
-   "hex": "013724a00101",
-   "note": "v1.1"
+   "hex": "013724a00101"
   },
   {
    "name": "MOTION2_SET",
@@ -426,14 +421,13 @@
     "sensors": 3
    },
    "hex": "013824820603",
-   "note": "v1.1: the client encodes any value; the band decides"
+   "note": "the client encodes any value; the band decides"
   },
   {
    "name": "MOTION2_GET",
    "seq": 57,
    "args": {},
-   "hex": "013925",
-   "note": "v1.1"
+   "hex": "013925"
   },
   {
    "name": "STREAM_START",
@@ -442,7 +436,7 @@
     "mask": 256
    },
    "hex": "013a100001",
-   "note": "v1.1: MOTION2 is bit 8"
+   "note": "MOTION2 is bit 8"
   }
  ],
  "responses": [
@@ -896,7 +890,7 @@
   },
   {
    "hex": "023101000101010100012a00ff07f40040e20100",
-   "note": "a v1.1 band: proto_minor 1, firmware 1.1.0",
+   "note": "an event band: proto_minor 1, firmware 1.1.0",
    "value": {
     "frame": "response",
     "seq": 49,
@@ -972,7 +966,7 @@
   },
   {
    "hex": "02330801",
-   "note": "what a v1.0 band answers to a v1.1 command",
+   "note": "an UNKNOWN_OPCODE response carries no data",
    "value": {
     "frame": "response",
     "seq": 51,
@@ -1118,7 +1112,7 @@
   },
   {
    "hex": "030308",
-   "note": "v1.1: MOTION2 frames were dropped",
+   "note": "MOTION2 frames were dropped",
    "value": {
     "frame": "notice",
     "code": "STREAM_DROPPED",
@@ -1442,7 +1436,7 @@
   },
   {
    "hex": "188813000000000000409c00000301f40118fcfa007d0030f80000",
-   "note": "v1.1 MOTION2, both sensors, 25 Hz: 12 bytes per sample",
+   "note": "MOTION2, both sensors, 25 Hz: 12 bytes per sample",
    "value": {
     "frame": "motion2",
     "t_ms": 5000,

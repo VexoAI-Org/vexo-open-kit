@@ -49,7 +49,7 @@ export function bandNumber() {
   const prefix = codec.NAME_PREFIX;
   const name = text.toLowerCase().startsWith(prefix.toLowerCase()) ? prefix + text.slice(prefix.length) : text;
   const number = codec.parseBandNumber(text) ?? codec.bandNumberOf(name);
-  if (number === null) throw new Error(`"${text}" is not a band number. Type just the number on your band or card, for example 42.`);
+  if (number === null) throw new Error(`"${text}" is not a band number. Type just the number on your band or its bag, for example 42.`);
   if (number === 0) throw new Error('Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it.');
   return number;
 }
@@ -112,7 +112,7 @@ export function onConnect(setup) {
       return;
     }
     if (number === null && link !== 'pretend') {
-      say('Type your band number first: the XX in Vexo-HACK-XX on your band or card (1 to 999).');
+      say('Type your band number first: the XX in Vexo-HACK-XX on your band or its bag (1 to 999).');
       return;
     }
     const mine = ++tries;

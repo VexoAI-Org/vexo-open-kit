@@ -306,7 +306,7 @@ class PythonExamples(unittest.TestCase):
             done = run("led.py", typed, "--sim")
             self.assertEqual(done.returncode, 2, typed)
             self.assertIn('led.py: error: argument number: "%s" is not a band number. Type just the number on your '
-                          'band or card, for example 42.' % typed, done.stderr)
+                          'band or its bag, for example 42.' % typed, done.stderr)
             self.assertNotIn("invalid int value", done.stderr)
             self.assertNotIn("Traceback", done.stderr)
 

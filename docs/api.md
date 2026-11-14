@@ -148,8 +148,8 @@ Bluetooth is taken; the two programs then share the band
 |---|---|
 | `number` | band number stored in the band |
 | `protocol` | `"1.0"` or `"1.1"`: what the band's firmware speaks |
-| `firmware` | `"1.0.0"` or `"1.1.x"` (`1.1.0`, `1.1.1`, `1.1.2`, ...). The last number only counts corrections: use `features` to decide what the band can do, never the firmware text |
-| `features` | list of names: what this band can do on top of firmware 1.0. Firmware 1.0: empty. Firmware 1.1: `fast-motion intervals clock` |
+| `firmware` | `"1.1.0"` on every event band. Use `features` to decide what the band can do, never the firmware text |
+| `features` | list of names: `fast-motion intervals clock` on an event band (firmware 1.1). Empty on the older firmware 1.0 |
 | `hardware` | `1` = XIAO nRF52840 Sense |
 | `capabilities` | list of names: `accel gyro events steps mic led battery temperature storage tx-power usb` |
 | `maxFrame` / `max_frame` | largest frame in bytes |
@@ -160,10 +160,11 @@ Bluetooth is taken; the two programs then share the band
 
 ## Firmware 1.0 and 1.1
 
-A band has firmware 1.0 or 1.1. The library asks the band when it connects
+Event bands run firmware 1.1.0. The library asks the band when it connects
 (`band.info.firmware`, `band.info.features`) and uses what the band has. You do not choose.
 
-Firmware 1.1 adds three things. Each one has a name in `band.info.features`:
+Firmware 1.1 has three things the older firmware 1.0 did not have. Each one has a name in
+`band.info.features`:
 
 | Feature | What it adds | Where |
 |---|---|---|
@@ -171,11 +172,7 @@ Firmware 1.1 adds three things. Each one has a name in `band.info.features`:
 | `intervals` | you choose how often activity, battery, temperature, link and mic level are sent | [How often: intervals](#how-often-intervals) |
 | `clock` | the band knows the real time | [Time](#time) |
 
-**Firmware 1.1 has passed on a real band on the test bench**, with firmware 1.1.0: fast
-motion at 208, 416 and 833 samples per second (and 1666 with acceleration only over the
-USB cable), the clock, and intervals. That is one band on a bench, not a room of 100; if
-a 1.1 feature misbehaves on yours, the second point below is the way out.
-A band with firmware 1.0 keeps working exactly as before. When you ask a 1.0 band for
+No event band has firmware 1.0, but the library still knows it. When you ask a 1.0 band for
 something only 1.1 has, the call fails with `not-available`, the message says so, and
 nothing is sent to the band.
 
@@ -328,7 +325,7 @@ Other events:
 | `restart` | You called `restart()` |
 | `sleep` | You called `sleep()` over Bluetooth |
 | `wrong-band` | Auto-reconnect only: a band with another number answered, so the library stopped |
-| `session-ended` | USB cable only: the band ended the USB session because this computer took no data for 5 seconds. The event also has `message`, a sentence to show. See [below](#over-the-usb-cable-when-the-band-ends-the-session) |
+| `session-ended` | USB cable only: the library found the streams you switched on switched off on the band. The event also has `message`, a sentence to show. See [below](#over-the-usb-cable-when-the-band-ends-the-session) |
 
 While `audio` or `micLevel` / `mic_level` is on, the microphone is on: the band shows a solid
 blue light and refuses LED commands (see Errors). Turn both off to use the LED again; your
@@ -460,8 +457,8 @@ listens to the room.
 
 ## Fast motion
 
-Needs firmware 1.1 (`fast-motion` in `band.info.features`). It has
-[passed on a real band on the test bench](#firmware-10-and-11).
+Needs firmware 1.1 (`fast-motion` in `band.info.features`), which
+[every event band has](#firmware-10-and-11).
 
 ```js
 band.on('motion', (m) => console.log(m.n, m.t, m.ax, m.ay, m.az));
@@ -627,9 +624,7 @@ same run of the band; a `t` that is smaller than the one before means the band r
 (or, after 49.7 days, that the counter wrapped). To put readings on a calendar, or to
 compare readings from before and after a restart, use `time`. `n`, the sample number of
 fast motion, starts at 0 on every new link. On both firmware versions the result is the
-same; only where the pairing comes from differs (`band.clock`). All of this is pinned by
-tests against the pretend band, and the band's clock has
-[passed on a real band on the test bench](#firmware-10-and-11) with firmware 1.1.0.
+same; only where the pairing comes from differs (`band.clock`).
 
 ## Controls
 
@@ -780,31 +775,18 @@ dashboard connects this way. A program to try it with:
 
 ### Over the USB cable: when the band ends the session
 
-A band with firmware 1.1.3 watches whether the computer still takes its data. When streams
-are on and the computer takes nothing at all for about 5 seconds, the band ends the USB
-session: it stops every stream, switches the microphone off and puts every setting back
-to its default. It sends no notice. The port stays open and commands are still answered.
-The usual cause is a web page that was stuck: a handler that computes for seconds, a
-dialog box, a breakpoint in the debugger.
+Over the USB cable the library watches the streams you switched on. If they go silent, it
+asks the band once which streams are on. While data arrives it asks nothing. If the band
+says your streams are off, the library closes the port and ends the link with reason
+`session-ended`; the event has a `message` to show.
 
-The library notices this by itself, over the USB cable only:
-
-- It sees that the streams you switched on have gone silent (or that your program itself
-  was stuck), and then asks the band once which streams are on. While data arrives it asks
-  nothing. If the band says your streams are off, the session was ended.
-- It then closes the port and ends the link with reason `session-ended`. The event has a
-  `message` to show, for example "The band ended the USB session because this computer
-  took no data for 5 seconds (a page or program that was stuck). Streams were stopped."
 - With auto-reconnect you get `reconnecting` (reason `session-ended`), the port is opened
   again with no click, your LED, settings and streams are set again, and you get
   `reconnected`: the same steps as after a pulled cable. Without auto-reconnect you get
   `disconnect` with reason `session-ended`: connect again and repeat every `configure`.
-
-How long it takes: with a stream on that sends at least once a second (motion, audio,
-loudness, steps), about 3 seconds after your program runs again. With only slow streams
-on, 3 of their intervals, at most 30 seconds. With only streams that are silent by nature
-(taps, battery on change) the band is asked once every 30 seconds, and at once after your
-program was stuck for 3 seconds or more.
+- An event band (firmware 1.1.0) does not end a USB session by itself, so this is rare.
+  You can see it when something else switched your streams off, for example a second
+  program on the band's other link ([Two programs on one band](#two-programs-on-one-band)).
 
 ```js
 band.on('reconnecting', (e) => { if (e.reason === 'session-ended') show(e.message); });
@@ -815,26 +797,15 @@ band.on("disconnect", lambda e: print(e.message) if e.reason == "session-ended" 
 ```
 
 **A handler must be short.** A web page has one thread. While a handler works, the page
-takes no data from the band. The browser keeps 8 kB for the page meanwhile (the library
-asks for that much: enough for half a second at the highest data rate, 2.6 seconds with
-the microphone alone). When that is full the band's 5 seconds start. So a page that is
-stuck loses its USB session after about 8 seconds with audio on, sooner with fast motion,
-and the microphone goes off. A shorter stop (more than the buffer holds, less than 5
-seconds) only loses stream frames: you get a `notice` with kind `stream-dropped`. Collect
-in the handler and do slow work in small pieces.
-
-Python is different. The library reads the cable on a thread of its own, also while your
-program is busy, and drops what your program does not take (it keeps at most 5000 frames).
-So the band does not see a busy Python program as stuck: a handler that hangs for a
-minute keeps its session, its streams and the microphone (blue light) for that minute.
-The band only ends the session of a Python program that is stopped as a whole (in a
-debugger, or suspended with Ctrl+Z). Keep handlers short in Python too: events wait in
-line behind a slow handler.
+takes no data from the band, and when the buffers are full stream frames are lost: you
+get a `notice` with kind `stream-dropped`. Collect in the handler and do slow work in
+small pieces. The Python library reads the cable on a thread of its own, also while your
+program is busy, and drops what your program does not take (it keeps at most 5000
+frames). Keep handlers short in Python too: events wait in line behind a slow handler.
 
 Bluetooth is not watched this way: there the library sends nothing extra and starts no
-timer. This behaviour has been tested with the pretend band and with fake ports only, not
-yet with a real band on firmware 1.1.3. To try it in your own program, see
-`endUsbSession()` / `end_usb_session()` in the table of the next section.
+timer. To try it in your own program, see `endUsbSession()` / `end_usb_session()` in the
+table of the next section.
 
 ## Two programs on one band
 
@@ -887,9 +858,7 @@ without an interval). While one of those is on, the library asks the band every 
 seconds, and only learns that it is gone once the band has stopped it. On the USB cable, a
 stream the band has stopped is reported as `session-ended`
 ([above](#over-the-usb-cable-when-the-band-ends-the-session)), and auto-reconnect sets it
-up again. The sharing itself was seen on a real band (firmware 1.1.0, the dashboard on
-Bluetooth beside a program on the cable). The event and `takeBack` are tested with the
-pretend band only, not yet with two programs on a real band. To try it in your own
+up again. To try it in your own
 program, see `otherProgramStarts` in [the pretend band](#the-pretend-band-making-things-happen).
 
 ## The pretend band: making things happen
@@ -974,10 +943,8 @@ With `async` Python and in JavaScript there is one thread only, so there `sim` i
 | A second program on the band's other link starts streams (names as in `configure`): this program gets no more of them, and after a few seconds `stream-taken` ([Two programs on one band](#two-programs-on-one-band)) | `sim.otherProgramStarts('motion')` | `sim.other_program_starts("motion")` |
 | That second program ends: the band stops the streams it had taken | `sim.otherProgramCloses()` | `sim.other_program_closes()` |
 | The band restarts by itself (reset button) | `sim.powerCycle()` | `sim.power_cycle()` |
-| The band ends the USB session, as firmware 1.1.3 does: streams stop, settings go back to their defaults, no notice, commands are still answered. From this call on the library watches the pretend band like a band on the cable, and you get `session-ended` ([above](#over-the-usb-cable-when-the-band-ends-the-session)) | `sim.endUsbSession()` | `sim.end_usb_session()` |
-| This computer takes no data for 7 seconds of band time. With a stream on, the band ends the session 5.2 seconds after its first frame was not taken. Shorter than that: frames are lost and you get a `stream-dropped` notice | `sim.stopReading(7)` | `sim.stop_reading(7)` |
-| The band paused for a moment (an empty packet and `stream-dropped`, the session goes on) | `sim.usbPause()` | `sim.usb_pause()` |
-| Watch the pretend band like a band on the cable from the start (otherwise it is only watched after one of the three calls above) | `sim.sessionWatch = true` | `sim.session_watch = True` (set it before you connect) |
+| The band's USB session ends: streams stop, settings go back to their defaults, no notice, commands are still answered. From this call on the library watches the pretend band like a band on the cable, and you get `session-ended` ([above](#over-the-usb-cable-when-the-band-ends-the-session)) | `sim.endUsbSession()` | `sim.end_usb_session()` |
+| Watch the pretend band like a band on the cable from the start (otherwise it is only watched after the call above) | `sim.sessionWatch = true` | `sim.session_watch = True` (set it before you connect) |
 | Do something later, on the band's clock | `sim.after(2, () => sim.tap('free-fall'))` | `sim.after(2, lambda: sim.tap("free-fall"))` |
 | The light the band shows | `sim.led`, `sim.onLed = (led) => ...` | `sim.led`, `SimTransport(42, on_led=fn)` |
 | A band with firmware 1.0, or one on the USB cable | `{ firmware: '1.0' }`, `{ via: 'usb' }` | `firmware="1.0"`, `via="usb"` |

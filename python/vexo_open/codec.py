@@ -111,7 +111,7 @@ MOTION2_RATES = (10, 25, 50, 100, 208, 416, 833, 1666)
 
 
 def band_id(number) -> str:
-    """band_id(7) -> "07", band_id(123) -> "123": the number as printed on the band and its card.
+    """band_id(7) -> "07", band_id(123) -> "123": the number as printed on the band and its bag.
     The number must be 0..999 (0 = number not set yet)."""
     try:
         n = int(number)

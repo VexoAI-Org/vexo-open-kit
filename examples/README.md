@@ -23,7 +23,7 @@ number only gives the pretend band its name (with no number it is band 42).
 | `python/led.py` | LED colours and blinking | `python3 vexo-open-kit/examples/python/led.py 42` |
 | `python/motion.py` | Live motion readings as text | `python3 vexo-open-kit/examples/python/motion.py 42` |
 | `python/motion_graph.py` | Live motion graph in a window (needs `python3 -m pip install matplotlib`) | `python3 vexo-open-kit/examples/python/motion_graph.py 42` |
-| `python/fast_motion.py` | Fast motion (band firmware 1.1): the fastest rate this link allows, the measured rate, and lost samples. A band with firmware 1.0 runs it at 100 a second | `python3 vexo-open-kit/examples/python/fast_motion.py 42` |
+| `python/fast_motion.py` | Fast motion: the fastest rate this link allows, the measured rate, and lost samples | `python3 vexo-open-kit/examples/python/fast_motion.py 42` |
 | `python/taps.py` | Tap and double-tap change the LED | `python3 vexo-open-kit/examples/python/taps.py 42` |
 | `python/storage.py` | Save a value on the band, read it back and remove it again | `python3 vexo-open-kit/examples/python/storage.py 42` |
 | `python/reconnect.py` | Keep going when the link drops: the library connects again by itself | `python3 vexo-open-kit/examples/python/reconnect.py 42` |
@@ -35,7 +35,7 @@ number only gives the pretend band its name (with no number it is band 42).
 | `web/motion-graph.html` | Live motion graph on a canvas, with the newest readings as numbers | same server, `/vexo-open-kit/examples/web/motion-graph.html` |
 | `web/taps.html` | Tap and double-tap change the LED | same server, `/vexo-open-kit/examples/web/taps.html` |
 | `node/hello.mjs` | The JavaScript library in Node with the pretend band (Node has no Web Bluetooth, so no real band) | `node vexo-open-kit/examples/node/hello.mjs 42` |
-| `node/fast-motion.mjs` | Fast motion (band firmware 1.1) with the pretend band: the fastest rate, counting lost samples, real time on every sample | `node vexo-open-kit/examples/node/fast-motion.mjs 42` |
+| `node/fast-motion.mjs` | Fast motion with the pretend band: the fastest rate, counting lost samples, real time on every sample | `node vexo-open-kit/examples/node/fast-motion.mjs 42` |
 
 Good to know:
 

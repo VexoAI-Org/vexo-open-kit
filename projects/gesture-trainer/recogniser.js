@@ -10,8 +10,8 @@
 //   3. match       finds the recorded example with the most similar shape.
 
 // The numbers to tune. They are guesses that work on the pretend band's motions: nobody
-// has tried them on a real wrist yet. What is measured (one band lying on a desk,
-// 2026-11-12) is how quiet a band at rest is: it turns at about 2.2 to 2.4 degrees/second
+// has tried them on a real wrist yet. What is measured (one band lying on a desk)
+// is how quiet a band at rest is: it turns at about 2.2 to 2.4 degrees/second
 // and its acceleration changes by at most 0.005 g from one sample to the next. Both start
 // numbers are far above that, so a band at rest never starts a gesture. Still to measure:
 // a still hand (it trembles more than a desk) and real gestures.

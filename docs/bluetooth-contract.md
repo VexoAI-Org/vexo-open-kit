@@ -305,15 +305,15 @@ band.configure(motion=50)
 
 - The library gives you one event per sample, already in g and in degrees per second.
 - After every connect the ranges are 2 g and 2000 degrees per second. A harder push reads exactly 2 g until you widen the range.
-- On a band with firmware 1.1 the library uses the faster stream below for `motion`; the events look the same.
+- The library uses the faster stream below for `motion`; the events look the same.
 
 More detail: [5.2 Motion sensor](../contract/contract.md#52-motion-sensor-imu_set-event_set) in the contract.
 
 ### Fast motion
 
-*MOTION2, type 0x18, bit 8, firmware 1.1*
+*MOTION2, type 0x18, bit 8*
 
-A second motion stream for bands with firmware 1.1. You choose the sensors (accelerometer, gyroscope or both) and the rate: 10, 25 (default), 50, 100, 208, 416, 833 or 1666 samples per second. Over Bluetooth the limit is 416 with both sensors and 833 with one; 1666 works only over USB with the accelerometer alone. Every sample has a number: sample i is number `sample_no` + i and was taken at `t_ms` + i x `period_us` / 1000. A jump in `sample_no` is exactly the number of samples lost.
+A second motion stream. You choose the sensors (accelerometer, gyroscope or both) and the rate: 10, 25 (default), 50, 100, 208, 416, 833 or 1666 samples per second. Over Bluetooth the limit is 416 with both sensors and 833 with one; 1666 works only over USB with the accelerometer alone. Every sample has a number: sample i is number `sample_no` + i and was taken at `t_ms` + i x `period_us` / 1000. A jump in `sample_no` is exactly the number of samples lost.
 
 **Switch it on.** `MOTION2_SET` with the rate and the sensors, then `STREAM_START` with bit 8 (mask 256).
 
@@ -805,9 +805,9 @@ More detail: [5.3 Microphone](../contract/contract.md#53-microphone-mic_set_gain
 
 ### Clock and time
 
-*TIME_SET, TIME_GET, firmware 1.1*
+*TIME_SET, TIME_GET*
 
-The band has no clock with its own battery. It counts milliseconds since it started: that is `t_ms`, the stamp in most data frames (it wraps after 49.7 days). With firmware 1.1 you can tell the band the real time once with `TIME_SET` (`unix_ms`: milliseconds since 1970-01-01 UTC). `TIME_GET` then gives `unix_ms` and `t_ms` for the same moment, and that pair turns any `t_ms` into real time: real time = `unix_ms` + (frame `t_ms` - `t_ms` of the answer).
+The band has no clock with its own battery. It counts milliseconds since it started: that is `t_ms`, the stamp in most data frames (it wraps after 49.7 days). You can tell the band the real time once with `TIME_SET` (`unix_ms`: milliseconds since 1970-01-01 UTC). `TIME_GET` then gives `unix_ms` and `t_ms` for the same moment, and that pair turns any `t_ms` into real time: real time = `unix_ms` + (frame `t_ms` - `t_ms` of the answer).
 
 **Switch it on.** `TIME_SET` once after you connect, or `TIME_GET` to read the pair.
 
@@ -876,7 +876,7 @@ band.on("tap", lambda e: print("tap at", e.time))
 - The clock is lost when the band restarts. A time outside 2020 to 2100 (for example seconds instead of milliseconds) gives BAD_ARG.
 - The exact rule, also right when `t_ms` wraps, is in the contract.
 
-More detail: [5.8 Clock](../contract/contract.md#58-clock-time_set-time_get-v11) in the contract.
+More detail: [5.8 Clock](../contract/contract.md#58-clock-time_set-time_get) in the contract.
 
 ## How to control the band
 
@@ -1088,7 +1088,7 @@ More detail: [5.5 Storage](../contract/contract.md#55-storage-store_) in the con
 
 *RESTART, SLEEP*
 
-`RESTART` restarts the band right after its answer; the connect window then opens for 60 seconds. `SLEEP` turns streams and the light off and closes the Bluetooth link; the band cannot be found until someone double-taps it. Neither command has arguments or data.
+`RESTART` restarts the band 200 ms after its answer; its light then blinks blue and the connect window is open for 60 seconds. The band does not close the Bluetooth link first, so your side notices a few seconds later that the link is gone. `SLEEP` turns streams and the light off and closes the Bluetooth link about 0.4 seconds after its answer; the band cannot be found until someone double-taps it. Neither command has arguments or data. To restart a band by hand, press the small RESET button on the board once (once only: two quick presses start the board's loader instead, and one more press brings the band back). A band with no battery also restarts when you unplug the USB cable and plug it in again. After a restart the light blinks blue once a second for 60 seconds, or until you connect.
 
 **Switch it on.** Nothing to switch on.
 
@@ -1111,7 +1111,7 @@ Example. Restart: `010505` decodes to: `seq` 5, `opcode` "RESTART".
 | 2 | 1 | u8 | `opcode` | 0x05 = RESTART |
 | 3 | 1 | u8 | `status` | 0 = OK; anything else is an error and no data follows |
 
-Example. The answer; the link closes a moment later: `02050500` decodes to: `seq` 5, `opcode` "RESTART", `status` "OK".
+Example. The answer; the band restarts 200 ms later: `02050500` decodes to: `seq` 5, `opcode` "RESTART", `status` "OK".
 
 **`SLEEP` command (you send this)**
 
@@ -1152,7 +1152,7 @@ More detail: [5.6 Device](../contract/contract.md#56-device) in the contract.
 
 ### Intervals
 
-*STREAM_SET_INTERVAL, STREAM_GET_INTERVAL, firmware 1.1*
+*STREAM_SET_INTERVAL, STREAM_GET_INTERVAL*
 
 How often a stream sends, for the five streams that are sent on a timer. `stream` is the bit number, `interval_ms` the time between two frames: activity (2) 100..3,600,000, default 1000; battery (4) 0 or 1000..3,600,000, default 0 = only when it changes; temp (5) 100..3,600,000, default 5000; link (6) 100..3,600,000, default 1000; mic_level (7) 20..10,000 in steps of 20, default 100. The answer also gives the limits (`min_ms`, `max_ms`). Any other stream answers BAD_ARG.
 
@@ -1226,13 +1226,13 @@ print(band.get_interval("battery"))
 - The motion rate is set with `IMU_SET` or `MOTION2_SET`, not here. Sound is always 50 packets a second.
 - Like every setting, intervals go back to their defaults when you disconnect.
 
-More detail: [5.7 Stream intervals](../contract/contract.md#57-stream-intervals-stream_set_interval-v11) in the contract.
+More detail: [5.7 Stream intervals](../contract/contract.md#57-stream-intervals-stream_set_interval) in the contract.
 
 ### Band information
 
 *GET_INFO, GET_NAME, SET_BAND_NUMBER*
 
-`GET_INFO` is the first thing to ask after connecting: the contract version (`proto_minor` 0 = v1.0, 1 = v1.1), the firmware version, the band number, which parts work (`caps`, one bit each: 0 accelerometer, 1 gyroscope, 2 motion events, 3 step counter, 4 microphone, 5 RGB LED, 6 battery, 7 chip temperature, 8 storage, 9 radio power control, 10 USB transport) and the largest frame it can send. `GET_NAME` returns the name as text. `SET_BAND_NUMBER` changes the number, **over USB only**: over Bluetooth the answer is DENIED.
+`GET_INFO` is the first thing to ask after connecting: the contract version (`proto_major` 1, `proto_minor` 1), the firmware version (1.1.0 on every event band), the band number, which parts work (`caps`, one bit each: 0 accelerometer, 1 gyroscope, 2 motion events, 3 step counter, 4 microphone, 5 RGB LED, 6 battery, 7 chip temperature, 8 storage, 9 radio power control, 10 USB transport) and the largest frame it can send. `GET_NAME` returns the name as text. `SET_BAND_NUMBER` changes the number, **over USB only**: over Bluetooth the answer is DENIED.
 
 **Switch it on.** Nothing to switch on.
 
@@ -1255,7 +1255,7 @@ Example. Ask who the band is: `010001` decodes to: `seq` 0, `opcode` "GET_INFO".
 | 2 | 1 | u8 | `opcode` | 0x01 = GET_INFO |
 | 3 | 1 | u8 | `status` | 0 = OK; anything else is an error and no data follows |
 | 4 | 1 | u8 | `proto_major` | always 1 |
-| 5 | 1 | u8 | `proto_minor` | 0 = v1.0, 1 = v1.1 |
+| 5 | 1 | u8 | `proto_minor` | 1 on an event band (contract v1.1) |
 | 6 | 1 | u8 | `fw_major` | firmware version |
 | 7 | 1 | u8 | `fw_minor` | firmware version |
 | 8 | 1 | u8 | `fw_patch` | firmware version |
@@ -1326,7 +1326,7 @@ Every response has a `status` byte. 0 is OK. With any other status the command c
 | Status | Name | Meaning |
 |---|---|---|
 | 0 | `OK` | The command worked. |
-| 1 | `UNKNOWN_OPCODE` | The band does not know this command. A band with firmware 1.0 answers this to a v1.1 command. |
+| 1 | `UNKNOWN_OPCODE` | The band does not know this command. |
 | 2 | `BAD_LENGTH` | The argument bytes do not have the size the command needs. |
 | 3 | `BAD_ARG` | A value is outside the allowed set. Nothing changed. |
 | 4 | `BUSY` | Storage is not ready (still starting, still erasing, or more than 10 writes in a second), or more than 4 commands were sent without waiting for responses. |
@@ -1345,7 +1345,7 @@ The refusals you are most likely to meet:
 | Started motion faster than this link allows | `DENIED` | `023a1006` | Choose a lower rate or one sensor ([Fast motion](#fast-motion)) |
 | Gave a value that is not allowed, for example a rate that does not exist | `BAD_ARG` | `020d2003` | Check the allowed values in the block for that command |
 | Started a stream whose part is not working, or the link stream over USB | `NOT_AVAILABLE` | `02091005` | Look at `caps` in `GET_INFO` |
-| Sent a firmware 1.1 command to a band with firmware 1.0 | `UNKNOWN_OPCODE` | `02330801` | Check `proto_minor` in `GET_INFO` first |
+| Sent an opcode the band does not have | `UNKNOWN_OPCODE` | `02290901` | Check the opcode against the cheat sheet below |
 | Wrote to storage more than 10 times in a second, or during an erase | `BUSY` | `021f7104` | Wait a moment and send it again |
 | Read a storage key that is empty | `NOT_FOUND` | `02217207` | Nothing was stored there |
 | Wrote to storage when it is full | `NO_SPACE` | `021e7108` | Delete keys you do not need |
@@ -1361,7 +1361,7 @@ The refusals you are most likely to meet:
 | Code | Name | Meaning | `arg` |
 |---|---|---|---|
 | 1 | `LOW_BATTERY` | The battery is low: the light is dimmed. | percent |
-| 2 | `CRITICAL_BATTERY` | The battery is almost empty: streams stop and the link closes in 2 s. | percent |
+| 2 | `CRITICAL_BATTERY` | The battery is almost empty: streams stop and the light goes off. Charge the band. | percent |
 | 3 | `STREAM_DROPPED` | Frames were lost because the link was too slow or a frame was larger than `max_frame`. | stream bit number, 0..8 |
 | 4 | `USB_POWER` | The USB cable was plugged in or pulled out. | 0 unplugged, 1 plugged |
 
@@ -1375,7 +1375,7 @@ In the library these arrive as the `notice` event. No response within 2 seconds 
 
 **Frames:** `01` command = `[01][seq][opcode][args]`, `02` response = `[02][seq][opcode][status][data]`, `03` notice = `[03][code][arg]`, `10` to `18` data. Numbers are little-endian. Write to RX `254f0002-...`, listen on TX `254f0003-...`, service `254f0001-df82-4a9c-a2b5-563a0f6b2021`.
 
-**Every command.** v1.1 = needs firmware 1.1.
+**Every command.**
 
 | Opcode | Command | You send (after `01 seq opcode`) | You get back (after `02 seq opcode 00`) | Explained in |
 |---|---|---|---|---|
@@ -1385,19 +1385,19 @@ In the library these arrive as the `notice` event. No response within 2 seconds 
 | `0x04` | `IDENTIFY` | `seconds` u8 | none | [Light](#light) |
 | `0x05` | `RESTART` | none | none | [Restart and sleep](#restart-and-sleep) |
 | `0x06` | `SLEEP` | none | none | [Restart and sleep](#restart-and-sleep) |
-| `0x07` | `TIME_SET` (v1.1) | `unix_ms` u64 | `set` u8, `unix_ms` u64, `t_ms` u32 | [Clock and time](#clock-and-time) |
-| `0x08` | `TIME_GET` (v1.1) | none | `set` u8, `unix_ms` u64, `t_ms` u32 | [Clock and time](#clock-and-time) |
+| `0x07` | `TIME_SET` | `unix_ms` u64 | `set` u8, `unix_ms` u64, `t_ms` u32 | [Clock and time](#clock-and-time) |
+| `0x08` | `TIME_GET` | none | `set` u8, `unix_ms` u64, `t_ms` u32 | [Clock and time](#clock-and-time) |
 | `0x10` | `STREAM_START` | `mask` u16 | `active` u16 | [Switching data on and off](#switching-data-on-and-off) |
 | `0x11` | `STREAM_STOP` | `mask` u16 | `active` u16 | [Switching data on and off](#switching-data-on-and-off) |
 | `0x12` | `STREAM_GET` | none | `active` u16 | [Switching data on and off](#switching-data-on-and-off) |
-| `0x13` | `STREAM_SET_INTERVAL` (v1.1) | `stream` u8, `interval_ms` u32 | `stream` u8, `interval_ms` u32, `min_ms` u32, `max_ms` u32 | [Intervals](#intervals) |
-| `0x14` | `STREAM_GET_INTERVAL` (v1.1) | `stream` u8 | `stream` u8, `interval_ms` u32, `min_ms` u32, `max_ms` u32 | [Intervals](#intervals) |
+| `0x13` | `STREAM_SET_INTERVAL` | `stream` u8, `interval_ms` u32 | `stream` u8, `interval_ms` u32, `min_ms` u32, `max_ms` u32 | [Intervals](#intervals) |
+| `0x14` | `STREAM_GET_INTERVAL` | `stream` u8 | `stream` u8, `interval_ms` u32, `min_ms` u32, `max_ms` u32 | [Intervals](#intervals) |
 | `0x20` | `IMU_SET` | `rate_hz` u8, `accel_range_g` u8, `gyro_range_dps` u16 | `rate_hz` u8, `accel_range_g` u8, `gyro_range_dps` u16 | [Motion](#motion) |
 | `0x21` | `IMU_GET` | none | `rate_hz` u8, `accel_range_g` u8, `gyro_range_dps` u16 | [Motion](#motion) |
 | `0x22` | `EVENT_SET` | `event_mask` u8, `tap_threshold_mg` u16 | `event_mask` u8, `tap_threshold_mg` u16 | [Taps and events](#taps-and-events) |
 | `0x23` | `EVENT_GET` | none | `event_mask` u8, `tap_threshold_mg` u16 | [Taps and events](#taps-and-events) |
-| `0x24` | `MOTION2_SET` (v1.1) | `rate_hz` u16, `sensors` u8 | `rate_hz` u16, `sensors` u8, `max_accel_hz` u16, `max_gyro_hz` u16, `max_both_hz` u16 | [Fast motion](#fast-motion) |
-| `0x25` | `MOTION2_GET` (v1.1) | none | `rate_hz` u16, `sensors` u8, `max_accel_hz` u16, `max_gyro_hz` u16, `max_both_hz` u16 | [Fast motion](#fast-motion) |
+| `0x24` | `MOTION2_SET` | `rate_hz` u16, `sensors` u8 | `rate_hz` u16, `sensors` u8, `max_accel_hz` u16, `max_gyro_hz` u16, `max_both_hz` u16 | [Fast motion](#fast-motion) |
+| `0x25` | `MOTION2_GET` | none | `rate_hz` u16, `sensors` u8, `max_accel_hz` u16, `max_gyro_hz` u16, `max_both_hz` u16 | [Fast motion](#fast-motion) |
 | `0x30` | `MIC_SET_GAIN` | `gain_half_db` u8 | `gain_half_db` u8 | [Microphone sound](#microphone-sound) |
 | `0x31` | `MIC_GET` | none | `gain_half_db` u8, `sample_rate` u16, `frame_ms` u8, `channels` u8, `bitrate` u16 | [Microphone sound](#microphone-sound) |
 | `0x40` | `RADIO_SET_TX_POWER` | `dbm` i8 | `dbm` i8 | [Link quality](#link-quality) |
@@ -1424,7 +1424,7 @@ In the library these arrive as the `notice` event. No response within 2 seconds 
 | `0x15` | 5 | 32 | `TEMP` | `t_ms` u32, `temp_mc` i32 | [Temperature](#temperature) |
 | `0x16` | 6 | 64 | `LINK` | `t_ms` u32, `rssi_dbm` i8, `tx_dbm` i8, `phy` u8 | [Link quality](#link-quality) |
 | `0x17` | 7 | 128 | `MIC_LEVEL` | `t_ms` u32, `peak_db` u8, `rms_db` u8 | [Microphone level](#microphone-level) |
-| `0x18` | 8 | 256 | `MOTION2` (v1.1) | `t_ms` u32, `sample_no` u32, `period_us` u32, `sensors` u8, `count` u8, then `ax, ay, az and/or gx, gy, gz` | [Fast motion](#fast-motion) |
+| `0x18` | 8 | 256 | `MOTION2` | `t_ms` u32, `sample_no` u32, `period_us` u32, `sensors` u8, `count` u8, then `ax, ay, az and/or gx, gy, gz` | [Fast motion](#fast-motion) |
 
 **Notices:** 1 `LOW_BATTERY`, 2 `CRITICAL_BATTERY`, 3 `STREAM_DROPPED`, 4 `USB_POWER`. **Statuses:** 0 `OK`, 1 `UNKNOWN_OPCODE`, 2 `BAD_LENGTH`, 3 `BAD_ARG`, 4 `BUSY`, 5 `NOT_AVAILABLE`, 6 `DENIED`, 7 `NOT_FOUND`, 8 `NO_SPACE`, 9 `IO_ERROR`. Both are explained in [Errors and refusals](#errors-and-refusals).
 

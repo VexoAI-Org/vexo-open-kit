@@ -255,9 +255,9 @@ Over the cable the band has no signal strength to report. Everything else works 
 | `No module named 'vexo_open'` | Python cannot find the library. Your program must be in `my-project/`, the kit folder inside it must be called exactly `vexo-open-kit`, and the three lines at the top of the program must be there. See [Write your own program](#write-your-own-program). |
 | `can't open file '...vexo-open-kit/vexo-open-kit/...'` (the kit's name twice), or the web server answers "File not found" for an address with `/vexo-open-kit/` in it | Your terminal is inside the kit folder, one step too deep. Every command on these pages is typed in `my-project/`, the folder that holds the kit. Type `cd ..` and run the command again. To see where you are, type `pwd` (Windows: `cd`): the last part must be `my-project`. A web server that was started inside the kit: stop it with Ctrl+C, type `cd ..`, start it again. |
 | "No band found on USB" | Try another cable (some only charge) and another USB port. If more than one band is plugged in, unplug the others. On a Mac, the first time a band is plugged in macOS may ask "Allow accessory to connect?". Press Allow, or switch it on under System Settings, Privacy & Security, "Allow accessories to connect". Until then the band has no port. The port is called `/dev/cu.usbmodem...` on a Mac, `COM` and a number on Windows, `/dev/ttyACM...` on Linux. |
-| Over the USB cable the data stops, or you see "The band ended the USB session ..." (`session-ended`) | The computer took no data from the band for 5 seconds, so the band stopped its streams and put its settings back. This happens when a web page is stuck: a handler that works for seconds, a dialog box, a breakpoint. The dashboard and a program with auto-reconnect connect again by themselves and set everything again. Without auto-reconnect, connect again and repeat every `configure`. Then keep handlers short: collect in the handler, do slow work in small pieces. Details: [api.md](api.md#over-the-usb-cable-when-the-band-ends-the-session). |
+| Over the USB cable the data stops, or you see "The band ended the USB session ..." (`session-ended`) | The library found the streams you switched on switched off on the band, for example because a second program used the band. The dashboard and a program with auto-reconnect connect again by themselves and set everything again. Without auto-reconnect, connect again and repeat every `configure`. Details: [api.md](api.md#over-the-usb-cable-when-the-band-ends-the-session). |
 | "not-available" when you turn on `link` | The `link` data (signal strength) only exists over Bluetooth. On the USB cable, leave `link` out of `configure`. Nothing in that `configure` call was turned on, so call it again without `link`. |
-| "not-available" and "needs firmware 1.1" | Your band has firmware 1.0. Motion faster than 100 samples per second, one sensor alone, a number of seconds for a stream, and setting the band's clock all need firmware 1.1. Use what 1.0 can do: `motion` 10, 25, 50 or 100, and `True` instead of a number. `band.info.firmware` shows which one your band has. See [Firmware 1.0 and 1.1](api.md#firmware-10-and-11). |
+| "not-available" and "needs firmware 1.1" | Event bands run firmware 1.1.0, so you should not see this on a real band: you see it when you connected with `protocol="1.0"` or made a pretend band with firmware 1.0. Motion faster than 100 samples per second, one sensor alone, a number of seconds for a stream, and setting the band's clock all need firmware 1.1. Use what 1.0 can do: `motion` 10, 25, 50 or 100, and `True` instead of a number. `band.info.firmware` shows which one your band has. See [Firmware 1.0 and 1.1](api.md#firmware-10-and-11). |
 | "denied" and "too much for Bluetooth" | You asked for more motion samples per second than the link can carry. The message says the most it can do and the way out: one sensor alone, or the USB cable. Or ask for `motion="fastest"`. See [Fast motion](api.md#fast-motion). |
 | Storage says "busy" | The band accepts 10 writes a second. The library waits and tries again by itself for up to 3 seconds. If you still see this, write less often. |
 | The web page (or the dashboard) does nothing when opened by double-click | Open it through the web server. In `my-project/`: `python3 -m http.server 8000 --bind 127.0.0.1`, then `http://localhost:8000/...` (8000, or the port you started it with). After a second the page says so itself. |
@@ -288,18 +288,21 @@ Over the cable the band has no signal strength to report. Everything else works 
   until you widen the range: `band.set_motion(accel_range=8)` (2, 4, 8 or 16). See
   [Controls](api.md#controls).
 - **Every reading has a real time.** Each event has `time` (in Python: seconds since 1970,
-  like `time.time()`). A band with firmware 1.0 has no clock of its own, so there the
-  library works `time` out from your computer's clock. See [Time](api.md#time).
-- **Two firmware versions.** A band has firmware 1.0 or 1.1. The pretend band has 1.1, so
-  a program that uses fast motion can work with `--sim` and then stop with "needs firmware
-  1.1" on a real band. On firmware 1.1.0 a real band passed on the test bench: fast motion,
-  the clock, and intervals ([details](api.md#firmware-10-and-11)).
+  like `time.time()`). See [Time](api.md#time).
+- **Event bands run firmware 1.1.0.** So does the pretend band: fast motion, the clock
+  and intervals work on both ([details](api.md#firmware-10-and-11)).
 - **The temperature is the chip's, not your skin's.** It reads a few degrees above room
   temperature because the chip warms itself.
 - **You only connect to your own band.** `Band.connect(42)` looks only for the band called
   `Vexo-HACK-42` and ignores every other band in the room.
 - **Connect only to your own band.** If your band flashes white or its light changes and
   it was not you, someone else has connected to it: restart it and tell a helper.
+- **To restart a band by hand,** press the small RESET button on the board once. Once
+  only: two quick presses start the board's loader instead (a drive called XIAO-SENSE
+  appears); copy nothing onto it and press RESET once more to get the band back. A band
+  with no battery also restarts when you unplug the USB cable and plug it in again.
+  After a restart the light blinks blue once a second for 60 seconds, or until you
+  connect: the band is ready.
 - **One Bluetooth connection at a time.** If your program is connected, the dashboard
   cannot be, and the other way round. A band that is connected cannot be found by anyone
   else, so "could not see the band" often means: something else is still connected.

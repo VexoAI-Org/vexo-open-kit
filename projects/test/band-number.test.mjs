@@ -7,7 +7,7 @@ import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { skip, serveKit, startChrome } from './chrome.mjs';
 
-const NOT_A_NUMBER = (text) => `"${text}" is not a band number. Type just the number on your band or card, for example 42.`;
+const NOT_A_NUMBER = (text) => `"${text}" is not a band number. Type just the number on your band or its bag, for example 42.`;
 const ZERO = 'Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it.';
 const GOOD = [['42', 42], ['07', 7], ['7', 7], ['007', 7], [' 42 ', 42], ['Vexo-HACK-42', 42], ['Vexo-HACK-07', 7],
   ['vexo-hack-42', 42], ['Vexo-HACK-123', 123], ['999', 999], ['1', 1]];

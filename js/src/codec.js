@@ -296,7 +296,7 @@ function codeOf(table, value, what) {
 
 // ------------------------------------------------------------------ names
 
-/** 7 -> "07", 42 -> "42", 123 -> "123": the number as it is printed on the band and its card. */
+/** 7 -> "07", 42 -> "42", 123 -> "123": the number as it is printed on the band and its bag. */
 export function bandId(number) {
   if (!Number.isInteger(number) || number < 0 || number > NUMBER_MAX) {
     throw new RangeError(`A band number is a whole number from 0 to ${NUMBER_MAX}, got "${number}"`);

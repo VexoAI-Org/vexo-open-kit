@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 from vexo_open.sync import Band, VexoError  # noqa: E402
 
 # The numbers to tune. Signal strength is in dBm, always below zero. Measured on one band on
-# a desk, 2026-11-12: about -18 to -19 next to the laptop, at the band's usual radio power.
+# a desk: about -18 to -19 next to the laptop, at the band's usual radio power.
 # That is where the meter is full. NEAR_DBM and FAR_DBM are still guesses that work on the
 # pretend band: nobody has walked away with a real band yet. Do that walk test in your room.
 METER_FULL_DBM = -20.0  # the meter is full at this signal: the band lies next to the laptop (measured)

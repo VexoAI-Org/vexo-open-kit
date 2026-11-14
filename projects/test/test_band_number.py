@@ -12,7 +12,7 @@ import unittest
 import running
 
 KIT = os.path.dirname(running.PROJECTS)
-NOT_A_NUMBER = 'error: argument number: "%s" is not a band number. Type just the number on your band or card, for example 42.'
+NOT_A_NUMBER = 'error: argument number: "%s" is not a band number. Type just the number on your band or its bag, for example 42.'
 ZERO = "error: argument number: Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it."
 
 

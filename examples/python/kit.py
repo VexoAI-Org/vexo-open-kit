@@ -64,7 +64,7 @@ def band_number(text):
     number = codec.band_number_of(codec.NAME_PREFIX + text[len(codec.NAME_PREFIX):]
                                   if text.lower().startswith(codec.NAME_PREFIX.lower()) else text)
     if number is None:
-        raise argparse.ArgumentTypeError('"%s" is not a band number. Type just the number on your band or card, '
+        raise argparse.ArgumentTypeError('"%s" is not a band number. Type just the number on your band or its bag, '
                                          'for example 42.' % text)
     return number
 

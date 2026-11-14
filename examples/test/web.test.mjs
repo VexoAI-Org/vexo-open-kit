@@ -296,11 +296,11 @@ test('node examples: the first argument is the band number, in the same forms as
 test('node examples: a wrong argument ends with one sentence and the command to type, as it was typed', async () => {
   const how = (name) => `Type:   node vexo-open-kit/examples/node/${name} 42   or   node vexo-open-kit/examples/node/${name} 42 --seconds 10\n`;
   const wrong = [
-    [['abc'], '"abc" is not a band number. Type just the number on your band or card, for example 42.'],
-    [['4x'], '"4x" is not a band number. Type just the number on your band or card, for example 42.'],
-    [['1234'], '"1234" is not a band number. Type just the number on your band or card, for example 42.'],
-    [['Vexo-HACK-'], '"Vexo-HACK-" is not a band number. Type just the number on your band or card, for example 42.'],
-    [['4.3'], '"4.3" is not a band number. Type just the number on your band or card, for example 42.'],   // the old "seconds" argument
+    [['abc'], '"abc" is not a band number. Type just the number on your band or its bag, for example 42.'],
+    [['4x'], '"4x" is not a band number. Type just the number on your band or its bag, for example 42.'],
+    [['1234'], '"1234" is not a band number. Type just the number on your band or its bag, for example 42.'],
+    [['Vexo-HACK-'], '"Vexo-HACK-" is not a band number. Type just the number on your band or its bag, for example 42.'],
+    [['4.3'], '"4.3" is not a band number. Type just the number on your band or its bag, for example 42.'],   // the old "seconds" argument
     [['0'], 'Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it.'],
     [['Vexo-HACK-00'], 'Band numbers are 1 to 999. 0 is what a band has before it gets a number: ask an organiser to number it.'],
     [['42', '--seconds', 'abc'], '--seconds needs a number of seconds from 0 to 3600, for example --seconds 10, not "abc".'],

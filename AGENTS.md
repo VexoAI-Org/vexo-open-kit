@@ -299,10 +299,10 @@ Do not edit `js/`, `python/`, `contract/`, `dashboard/` or `scripts/`. They are 
 kit. If something in them looks wrong, tell the team instead of changing it.
 
 What is tested on a real band, and what is not: the kit's features (the libraries, the
-dashboard, the examples) are bench-tested on a real band. The six projects are not, as
+dashboard, the examples) are tested on a real band. The six projects are not, as
 whole projects. They run on the pretend band. Of their thresholds (the tunable numbers:
 how loud is a clap, which signal strength is "far", how still is "still") a few were
-measured on one real band on a desk on 2026-11-12 (the clap jump, the motion sensor at
+measured on one real band on a desk (the clap jump, the motion sensor at
 rest, the signal next to the laptop); the others are guesses. Each project's README says
 which. They will need tuning. Tell the team so when you start from a project.
 
@@ -471,8 +471,8 @@ develop and to test, then switch to the real band by removing the transport opti
 - JavaScript: `Band.connect(BAND, { transport: 'sim' })`
 - Kit examples: `python3 vexo-open-kit/examples/python/led.py --sim`, `node vexo-open-kit/examples/node/hello.mjs` (typed in `my-project/`)
 - Example web pages: tick **Pretend band**. Dashboard: press **Try without a band**.
-- The pretend band has firmware 1.1. The team's real band may have 1.0 (rule 13). To test
-  against a pretend band with firmware 1.0, make it yourself and pass it as the transport.
+- The pretend band has firmware 1.1, like every event band (rule 13). To test
+  against a pretend band with the older firmware 1.0, make it yourself and pass it as the transport.
   Python: `from vexo_open.transports.sim import SimTransport`, then
   `Band.connect(BAND, transport=SimTransport(BAND, firmware="1.0"))`. JavaScript:
   `Band.connect(BAND, { transport: new SimTransport(BAND, { firmware: '1.0' }) })`, with
@@ -712,15 +712,8 @@ For that, remember the first `steps` the program sees and subtract it (the dashb
     "No band found on USB". The port is `/dev/cu.usbmodem...` on a Mac, `COM` and a number
     on Windows, `/dev/ttyACM...` on Linux.
     Keep handlers short over the cable: a web page that computes for seconds without a
-    pause takes no bytes from the band meanwhile, and newer firmware then ends the session.
-    From firmware 1.1.3 that happens after a few seconds: every stream is off and the
-    settings are back at their defaults. The library notices this within a few seconds.
-    With `autoReconnect` / `auto_reconnect` on, it opens the cable again and sets
-    everything up again by itself (events `reconnecting` with reason `session-ended`, then
-    `reconnected`). Without it, the program gets `disconnect` with reason `session-ended`:
-    connect again and repeat every `configure` and `set_led`. To try this without a band,
-    the pretend band has `endUsbSession()` / `end_usb_session()` ("The pretend band" in
-    `docs/api.md`). Tested with the pretend band only, not yet on a real band.
+    pause takes no bytes from the band meanwhile, and stream frames are lost (`notice`
+    with kind `stream-dropped`).
 11. **Wrong band.** If the band that answers has another number, `connect` fails with code
     `wrong-band`. Do not work around it; ask the team to check the number on their band.
 12. **The cable is not the same as Bluetooth in two places.** `link` (signal strength) is
@@ -728,20 +721,12 @@ For that, remember the first `steps` the program sees and subtract it (the dashb
     on nothing from that call, and `get_radio()` gives `rssi` and `phy` `None`, `interval_ms`
     0 and `mtu` 0. `sleep()` over Bluetooth closes the link (`disconnect`, reason `sleep`);
     over USB the streams and the LED go off but the link stays open and keeps answering.
-13. **Two firmware versions: look before you use the new parts.** `band.info.firmware` is
-    `1.0.0` or `1.1.x` (the last number only counts corrections; decide by `features`, never
-    by the firmware text). `band.info.features` lists what the band adds to 1.0: empty on 1.0;
-    `fast-motion`, `intervals` and `clock` on 1.1. Everything else in this file works on
-    both. When a 1.0 band is asked for a 1.1 feature, the call fails with `not-available`,
-    the message says which firmware is needed, and nothing is sent. So for a real band,
-    either stay with what 1.0 can do, or check first (`"fast-motion" in band.info.features`,
-    JavaScript `band.info.features.includes('fast-motion')`) and have a plan for 1.0.
-    All three 1.1 features have passed on a real band on the test bench, with firmware
-    1.1.0: fast motion (208, 416 and 833 samples per second, and 1666 with acceleration
-    only over the USB cable), the clock, and intervals. If a 1.1 feature still misbehaves
-    on a team's band, connect with
-    `Band.connect(BAND, protocol="1.0")` (JavaScript `{ protocol: '1.0' }`): the library
-    then uses only what 1.0 can do.
+13. **Event bands run firmware 1.1.0.** `band.info.firmware` is `1.1.0` and
+    `band.info.features` lists `fast-motion`, `intervals` and `clock`. The library still
+    knows the older firmware 1.0, which no event band has: there `features` is empty, and
+    a call that needs 1.1 fails with `not-available`, the message says which firmware is
+    needed, and nothing is sent. To make the library use only what 1.0 can do, connect
+    with `Band.connect(BAND, protocol="1.0")` (JavaScript `{ protocol: '1.0' }`).
 14. **Fast motion has a limit for each link.** Rates are 10, 25, 50, 100, 208, 416, 833,
     1666 samples per second; another number is `bad-arg`. The most a link carries:
     Bluetooth 416 with both sensors, 833 with one; USB cable 833 with both or with the

@@ -27,7 +27,7 @@ to stop by itself.
 
 `leash.py` (about 130 lines). The numbers to tune are at the top. `NEAR_DBM`, `FAR_DBM`,
 `SMOOTH_SECONDS` and `SLACK_DBM` are guesses: nobody has walked away with a real band yet.
-`METER_FULL_DBM` (-20) is measured on one band on a desk, 2026-11-12. `READINGS_MOST` (100) is
+`METER_FULL_DBM` (-20) is measured on one band on a desk. `READINGS_MOST` (100) is
 the most readings it keeps, so a faulty band cannot fill the computer. `zone_for()` picks
 the zone and keeps it from flickering, `meter()` draws the line of text. The handlers only
 put what happened into an inbox; the loop at the bottom smooths the signal and reacts. The

@@ -21,8 +21,8 @@ They are starting points to copy, not the assignment: your own project can be an
 the examples) are tested on a real band. These six projects are not, as whole projects:
 they run on the pretend band, and their tests pass there. The numbers that decide how a
 project behaves (how big a jump in loudness is a clap, which signal strength is "far", how
-still is "still") started as guesses. A few were measured on one band on a desk on
-2026-11-12: the jump in loudness of a clap (clap-lights), the motion sensor at rest
+still is "still") started as guesses. A few were measured on one band on a desk:
+the jump in loudness of a clap (clap-lights), the motion sensor at rest
 (gesture-trainer) and the signal next to the laptop (band-leash). The others are still
 guesses, for example which signal is "near" and "far", which needs a walk test. You will
 need to tune them. Each project keeps them in one place, named in its README under "Read

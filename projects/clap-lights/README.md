@@ -28,7 +28,7 @@ already, do not start a second one:
 
 - `detector.js` (about 60 lines) decides what a clap is. It knows nothing about the page
   or the band. The numbers to tune (`RISE_DB`, `DOUBLE_MS`, ...) are at its top. `RISE_DB`
-  (20) is measured on one band on a desk, 2026-11-12; the others are still guesses.
+  (20) is measured on one band on a desk; the others are still guesses.
 - `lights.js` (about 130 lines) is the page: `onLevel` handles one loudness reading, `draw`
   paints the lamp, the ring and the bars.
 - `index.html` is the page. `../shared/page.js` connects and handles a dropped link. The
