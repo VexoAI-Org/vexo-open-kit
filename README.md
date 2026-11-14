@@ -1,17 +1,37 @@
 # Vexo Open kit
 
+## What this repo is
+
+This kit is a reference: instructions, the Bluetooth contract, two small libraries, a
+dashboard to check your band, and examples to copy from. It is not a template and it is
+not your project.
+
+- **Your project is your own.** Make your own folder and your own repository, in any
+  language, on any platform (a web page, Python, a phone app, a game engine), and build
+  whatever you want with the band's motion, taps, light and microphone.
+- You may copy any file from here into your project (MIT licence).
+- You never need to change this repo or push to it.
+- You do not want the libraries at all? The contract ([contract/contract.md](contract/contract.md))
+  says how to talk to the band directly over Bluetooth.
+
+## The kit in short
+
 Everything you need to build something with a Vexo Open band: a wrist band with a motion
 sensor, a microphone and a colour LED. Any laptop or Android phone can connect to it over
 Bluetooth, or by USB cable. No app and no account.
+
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
 
 - New here? Start with [Getting started](docs/getting-started.md): from nothing to a
   blinking LED in ten minutes.
 - Using an AI coding agent? Point it at [AGENTS.md](AGENTS.md). It tells the agent how to
   build your project with this kit, and to ask for your band number first.
 - The dashboard is a web page in this kit that shows your band's live data. You open it
-  from your own computer: see the next section. At the event the QR code on your team card
-  opens the same page online (`https://vexoai-org.github.io/vexo-open-kit/?band=42` for the
-  band called `Vexo-HACK-42`).
+  from your own computer: see the next section.
+- Your band number is written on the bag your band came in. Number 42 means the band is
+  called `Vexo-HACK-42`.
 
 ## Try it in one minute (no band needed)
 
@@ -51,7 +71,8 @@ points to 8000.)
 
 Six steps take you from an empty laptop to your own program that hears and acts. Each step
 has one command, and each works with a pretend band too (`--sim` in place of the number).
-`42` is the band number on your card; type the commands in `my-project/` (the folder from the
+`42` is the example band number (42 = your band number: use the one written on your band's
+bag); type the commands in `my-project/` (the folder from the
 section above).
 
 | Step | What you do | What you see |
@@ -67,6 +88,13 @@ The band talks to **one program at a time** over Bluetooth: close the dashboard 
 run a Python example, and the other way round. Before every connect, **double-tap the band**:
 it can then be found for 60 seconds.
 
+**You only ever connect to your own band.** `?band=42` at the end of the dashboard address
+makes the browser's list show only `Vexo-HACK-42`, so you cannot pick a neighbour's band by
+mistake. Without `?band=` the dashboard first asks you to type your number. In a program,
+`Band.connect(42)` looks only for `Vexo-HACK-42` and ignores every other band in the room.
+Connect only to your own band. If your band flashes white or its light changes and it was
+not you, someone else has connected to it: restart it and tell a helper.
+
 ## Get the sound and build with it
 
 The band's microphone is yours to use in three ways, from least to most work:
@@ -77,8 +105,8 @@ The band's microphone is yours to use in three ways, from least to most work:
 | Text understood by an AI model (an answer, a decision, a summary) | `ai.py` after `speech.listen` | `examples/python/ask_the_band.py`, `voice_commands.py`, `meeting_notes.py` |
 | The sound itself, to save or to send to any service you like | `PcmDecoder` in Python, `BandAudio` in a web page: plain sound, 16 000 samples a second, one channel | [docs/speech.md](docs/speech.md), `python/vexo_open/audio.py`, `js/src/audio.js` |
 
-`python3 vexo-open-kit/examples/python/audio_to_text.py 42 --text no` saves what the
-microphone hears as a sound file and sends nothing anywhere: the quickest proof that the
+`python3 vexo-open-kit/examples/python/audio_to_text.py 42 --text no` (42 is the example band
+number: use yours) saves what the microphone hears as a sound file and sends nothing anywhere: the quickest proof that the
 sound is in your hands. Text needs your team's Deepgram key, and the sound then goes to
 that company: tell the people near you. While the microphone is on, the band shows a solid
 blue light.
@@ -92,7 +120,19 @@ setting the keys to three examples that run with one command, are in one place:
 
 ## Where your own code goes
 
-In `my-project/` itself, never inside the kit folder. Every command, program and web page
+In `my-project/` itself, never inside the kit folder. `my-project/` is your own repository:
+
+    cd my-project
+    git init
+    printf 'vexo-open-kit/\n.env\n' >> .gitignore
+
+The `.gitignore` line keeps the kit out of your repository: the kit stays a plain folder
+inside `my-project/`, and each teammate downloads the kit into their own `my-project/` the
+same way. The second line keeps `.env`, the file with your team's keys, out of your
+repository: **`.env` never goes into a commit.** (Building without the kit's libraries? Then
+you do not need the kit folder in your project at all.)
+
+ Every command, program and web page
 in these pages is written for the layout above, with the terminal in `my-project/`.
 [Getting started](docs/getting-started.md#write-your-own-program) shows the first program
 for it.
@@ -110,7 +150,6 @@ for it.
 | `AGENTS.md` | [The guide for AI coding agents](AGENTS.md), and the key setup for people: "Audio to text to AI". | Point your coding agent at it before it writes anything. Read its key section yourself. |
 | `env.example` | An empty form for your team's two keys. | Copy it to `my-project/.env` and fill it in. That file stays on your computer. |
 | `contract/` | [`contract.md`](contract/contract.md): every command the band understands and every kind of data it sends, byte by byte, with test frames. | Only if you write your own library, in another language for example. |
-| `cards/` | Generator for the printed team cards (band name + QR code). | Organisers only. |
 | `scripts/`, `.githooks/` | The kit's own safety checks. | Maintainers only. |
 
 ## Tests
@@ -123,7 +162,7 @@ safety checks:
 
 Or one part at a time:
 
-    node --test js/test/*.test.js cards/test/*.mjs dashboard/test/*.test.mjs
+    node --test js/test/*.test.js dashboard/test/*.test.mjs
     (cd python && python3 -m unittest discover -s tests)
     python3 -m unittest discover -s examples/test
     node --test examples/test/*.mjs

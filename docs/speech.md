@@ -3,6 +3,10 @@
 How the sound from the band's microphone becomes text: the decoder, the speech interface,
 and the service the kit uses for the text, Deepgram.
 
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
+
 Two things first:
 
 - **The microphone records everyone near the band**, not only the person wearing it. The

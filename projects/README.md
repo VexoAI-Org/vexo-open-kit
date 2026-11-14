@@ -2,6 +2,11 @@
 
 Six small, complete projects to start from. Each one shows a different part of the band,
 runs with the pretend band out of the box, and ends with ideas for making it your own.
+They are starting points to copy, not the assignment: your own project can be anything.
+
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
 
 | Project | What it does | Runs in | Difficulty |
 |---|---|---|---|

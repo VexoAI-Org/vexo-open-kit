@@ -38,7 +38,7 @@ if (chosen) {
 } else {
   $('pick').hidden = false;
   $('connect').hidden = true;
-  if (raw !== null) $('pick-message').textContent = `"${raw}" is not a band number. Type the number on your card.`;
+  if (raw !== null) $('pick-message').textContent = `"${raw}" is not a band number. Type the number written on your band's bag.`;
 }
 $('pick-form').addEventListener('submit', (e) => {
   e.preventDefault();

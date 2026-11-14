@@ -4,6 +4,10 @@ The kit turns speech into text with [Deepgram](https://deepgram.com), an online
 speech-to-text service. This page is everything a team needs: what it does, the rule about
 other people's voices, where the key goes, and the code.
 
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
+
 ## What it is
 
 Your program (or the dashboard) sends the sound of the band's microphone to Deepgram over

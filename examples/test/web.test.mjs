@@ -243,10 +243,10 @@ test('a wrong band number gives a message, not a crash', async () => {
   for (const typed of ['abc', '4x', '1234', '-5']) {
     const $ = await openPage('led.js', { number: typed });
     await $('#connect').fire('click');
-    assert.equal($('#message').textContent, `"${typed}" is not a band number. Type the number on your card.`);
+    assert.equal($('#message').textContent, `"${typed}" is not a band number. Type the number written on your band's bag.`);
     assert.equal($('#connect').disabled, false);
   }
-  assert.match(readFileSync(join(EXAMPLES, '..', 'dashboard', 'app.js'), 'utf8'), /`"\$\{raw\}" is not a band number\. Type the number on your card\.`/);
+  assert.match(readFileSync(join(EXAMPLES, '..', 'dashboard', 'app.js'), 'utf8'), /`"\$\{raw\}" is not a band number\. Type the number written on your band's bag\.`/);
 });
 
 test('the band number may be typed as 7, 07 or the full name', async () => {

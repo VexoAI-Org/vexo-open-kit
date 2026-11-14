@@ -1,11 +1,16 @@
 # Examples
 
-Short programs to copy from. Run the commands in `my-project/`, the folder that holds the
+Short programs to copy from. They are starting points, not the assignment: build what
+you want in your own project. Run the commands in `my-project/`, the folder that holds the
 kit (the same place as everywhere in these pages; see
 [Getting started](../docs/getting-started.md#get-the-kit-2-minutes)). On Windows, type
 `python` wherever this page says `python3`.
 
-Every Python example takes your band number (`42` below). Add `--usb` to use the USB cable,
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
+
+Every Python example takes your band number (`42` below is the example: 42 = your band number). Add `--usb` to use the USB cable,
 or use `--sim` instead of the number to run with a pretend band and no hardware. Add
 `--seconds 10` to stop after 10 seconds.
 

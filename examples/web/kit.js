@@ -21,7 +21,7 @@ export function bandNumber() {
   const text = $('#number').value.trim() || (new URLSearchParams(location.search).get('band') ?? '').trim();
   if (text === '') return null;
   const number = codec.parseBandNumber(text) ?? codec.bandNumberOf(text);
-  if (number === null) throw new Error(`"${text}" is not a band number. Type the number on your card.`);
+  if (number === null) throw new Error(`"${text}" is not a band number. Type the number written on your band's bag.`);
   return number;
 }
 

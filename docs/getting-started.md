@@ -2,6 +2,14 @@
 
 From nothing to a blinking LED in about ten minutes.
 
+This kit is only the instructions and the reference. Your project is your own: your own
+folder, your own repository, any language, and whatever you want to build. The examples
+here are for copying from, not the limit of what you can make.
+
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
+
 | Step | Time |
 |---|---|
 | [Get the kit](#get-the-kit-2-minutes) | 2 minutes |
@@ -13,16 +21,16 @@ No band yet? Every step also works with a pretend band. Look for "No band?" in e
 
 ## What you need
 
-- Your band and its team card. The card shows the band's name, for example
-  **Vexo-HACK-42**. The number at the end (42) is your band number. Band numbers are 1 to
+- Your band and the bag it came in. Your band number is written on the bag. Number 42
+  means the band is called **Vexo-HACK-42**. Band numbers are 1 to
   999; 0 is not a band you can ask for.
 - A laptop (Windows, macOS, Linux or a Chromebook) with **Chrome** or **Edge**.
 - Bluetooth switched on.
 
 An iPhone or iPad cannot connect to the band from a web page. Firefox and Safari cannot
-connect either. An Android phone with Chrome can, but only for a page that is online: at
-the event, the dashboard behind the QR code on your card. Everything on this page is done
-on a laptop.
+connect either. Everything on this page is done on a laptop. (Chrome on an Android phone
+has Bluetooth, but a phone cannot open `localhost` on your laptop: a page for a phone has
+to be published on an `https://` address.)
 
 ## Get the kit (2 minutes)
 
@@ -69,16 +77,14 @@ has a small web server built in.
 3. Open <http://localhost:8000/vexo-open-kit/dashboard/?band=42> in Chrome or Edge on the
    same laptop, with your own number in place of `42`.
 4. **Double-tap** the band. Its light blinks blue. It can now be found for 60 seconds.
-5. Press **Connect**. The browser shows a short list. Pick your band, for example
-   `Vexo-HACK-42`.
+5. Press **Connect**. The browser shows a list with one band in it: yours. The `?band=42`
+   in the address makes the list show only `Vexo-HACK-42`, so you cannot pick a
+   neighbour's band by mistake. (Without `?band=` in the address the dashboard first asks
+   you to type your number.) Pick your band.
 6. The band flashes white. The dashboard now shows live motion, taps, battery and the
    chip's temperature, and you can change the LED colour.
 
 No band? Press **Try without a band** on the dashboard.
-
-At the event, the QR code on your team card opens this same page online
-(`https://vexoai-org.github.io/vexo-open-kit/?band=42`), with no server to start. Until
-the organisers have switched that on, the steps above are the way in.
 
 If the band is not in the list, see [When something does not work](#when-something-does-not-work).
 
@@ -236,7 +242,7 @@ Over the cable the band has no signal strength to report. Everything else works 
 | My light changed by itself, or a program said "then off" and the light stayed on | Another program is connected to the same band (one on Bluetooth, one on the USB cable). There is one light and they share it: the last one to set it wins, and the light only goes off by itself when the last program disconnects. Set your colour again, or close the other program. |
 | `python3 -m pip install bleak` prints a long warning about a "yanked version" of `pyobjc-core` | Harmless. It is a note about one of the packages bleak uses on a Mac, seen with the Python 3.9 that comes with macOS. If the last line starts with `Successfully installed`, go on. |
 | The fast-motion example says "Asked for 833 a second, measured 865.2 a second" | Not a fault. The motion sensor counts with its own clock, which runs a few percent fast or slow. The time of each reading (`time` and `t`) is measured by the band and is right. See [Fast motion](api.md#fast-motion). |
-| The list shows a band that is not yours | Check the number on the band against your card. Pick only your own number. |
+| The list shows a band that is not yours | Check the name in the list against the number on your band's bag. Pick only your own number. |
 | "This is Vexo-HACK-17, not Vexo-HACK-42" | The band has a different number than the one you typed. Use the number printed on the band. |
 | The browser says it has no Bluetooth | Use Chrome or Edge on a laptop or Android. iPhone, iPad, Firefox and Safari cannot connect. Check that Bluetooth is switched on. |
 | macOS asks whether the browser or the terminal may use Bluetooth | Say yes. If you said no earlier, switch it on under System Settings, Privacy & Security, Bluetooth, then restart the browser or terminal. |
@@ -256,7 +262,6 @@ Over the cable the band has no signal strength to report. Everything else works 
 | Storage says "busy" | The band accepts 10 writes a second. The library waits and tries again by itself for up to 3 seconds. If you still see this, write less often. |
 | The web page (or the dashboard) does nothing when opened by double-click | Open it through the web server. In `my-project/`: `python3 -m http.server 8000 --bind 127.0.0.1`, then `http://localhost:8000/...` (8000, or the port you started it with). After a second the page says so itself. |
 | `OSError: ... Address already in use` when you start the web server | Another program has that port: perhaps your own server from step 1, still running in another terminal. Then use that one; one server is enough. If not, use another port: `python3 -m http.server 8001 --bind 127.0.0.1`, then `http://localhost:8001/...`. |
-| The QR code on the card, or the online dashboard address, shows "404" or "not found" | The online dashboard is not switched on yet. Open the dashboard from your own computer: [step 1](#1-see-your-band-working-2-minutes). |
 | The page stays on "Connecting..." | Press **Cancel**, then Connect again. If the browser shows no list of bands, switch Bluetooth on and reload the page. Without a pick the page gives up by itself after 2 minutes. |
 | A band call inside a handler seems to do nothing | Look at the terminal: an error in a handler is printed there and the program goes on. See [Reacting to the band: handlers](#reacting-to-the-band-handlers). |
 | The connection drops | Move closer. After a dropped connection the band can be found again for 2 minutes without a double-tap; after that, double-tap again. The dashboard reconnects by itself during those 2 minutes. Your own program does the same when you connect with `auto_reconnect=True` (see [the library API](api.md#when-the-link-drops-auto-reconnect)). |
@@ -291,6 +296,10 @@ Over the cable the band has no signal strength to report. Everything else works 
   the clock, and intervals ([details](api.md#firmware-10-and-11)).
 - **The temperature is the chip's, not your skin's.** It reads a few degrees above room
   temperature because the chip warms itself.
+- **You only connect to your own band.** `Band.connect(42)` looks only for the band called
+  `Vexo-HACK-42` and ignores every other band in the room.
+- **Connect only to your own band.** If your band flashes white or its light changes and
+  it was not you, someone else has connected to it: restart it and tell a helper.
 - **One Bluetooth connection at a time.** If your program is connected, the dashboard
   cannot be, and the other way round. A band that is connected cannot be found by anyone
   else, so "could not see the band" often means: something else is still connected.

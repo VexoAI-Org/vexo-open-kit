@@ -44,7 +44,7 @@ sys.exit(124)
 
 if [ "${1:-}" = "--tests" ]; then
   say "== tests"
-  limited node --test --test-timeout="${TEST_SECONDS}000" cards/test/*.mjs js/test/*.test.js dashboard/test/*.test.mjs examples/test/*.mjs || fail=1
+  limited node --test --test-timeout="${TEST_SECONDS}000" js/test/*.test.js dashboard/test/*.test.mjs examples/test/*.mjs || fail=1
   (cd python && limited python3 -m unittest discover -s tests) || fail=1
   limited python3 -m unittest discover -s examples/test || fail=1
   limited python3 -m unittest discover -s projects/test || fail=1

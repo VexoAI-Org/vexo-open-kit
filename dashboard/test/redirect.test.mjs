@@ -1,5 +1,5 @@
-// The kit's top page (index.html + redirect.js) sends a visitor on to the dashboard. The
-// team cards link there with ?band=42, and a student may open it by double-click.
+// The kit's top page (index.html + redirect.js) sends a visitor on to the dashboard. An
+// address can carry ?band=42, and a student may open it by double-click.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

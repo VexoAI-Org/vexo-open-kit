@@ -25,7 +25,7 @@ import unittest
 KIT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NODE = shutil.which("node")
 PAGES = ["README.md", "AGENTS.md", "docs/getting-started.md", "docs/api.md", "docs/speech.md", "docs/deepgram.md", "examples/README.md",
-         "contract/README.md", "contract/contract.md", "cards/README.md"]
+         "contract/README.md", "contract/contract.md"]
 # the pages a student (or a student's AI agent) works from
 STUDENT_PAGES = ["README.md", "AGENTS.md", "docs/getting-started.md", "docs/api.md", "docs/speech.md", "docs/deepgram.md",
                  "examples/README.md"]
@@ -983,41 +983,55 @@ class Wording(unittest.TestCase):
                     with open(path, encoding="utf-8", errors="replace") as f:
                         yield os.path.relpath(path, KIT), f.read()
 
-    def test_the_hosted_dashboard_is_one_constant_and_no_page_leads_with_it_while_it_is_not_live(self):
-        # cards/generate.mjs holds the address and whether it is switched on. The pages name
-        # that address and no other. While it is not live (a 404), no page sends a student
-        # there as a step: the local server comes first, and the address is only what "at
-        # the event the QR code on your team card opens".
-        source = read("cards/generate.mjs")
-        url = re.search(r"^export const DASHBOARD_URL = '(https://[^']+/)';$", source, re.M).group(1)
-        live = re.search(r"^export const DASHBOARD_LIVE = (true|false);$", source, re.M).group(1) == "true"
-        host = re.match(r"https://([^/]+)/", url).group(1)
-        named_on = []
+    def test_the_dashboard_is_opened_from_the_local_server_and_the_number_is_on_the_bag(self):
+        # No hosted dashboard, no printed sheet to scan: the band number is written on the bag
+        # the band comes in, and the dashboard is opened from the web server in my-project/.
         for path, text in self.kit_texts():
-            if host not in text or path in (os.path.join("cards", "generate.mjs"), os.path.join("examples", "test", "test_docs.py")):
+            if path == os.path.join("examples", "test", "test_docs.py"):
                 continue
-            self.assertIn(path.replace(os.sep, "/"), STUDENT_PAGES, "%s names the hosted address" % path)
-            named_on.append(path.replace(os.sep, "/"))
-            for found in re.finditer(r"https://%s[^\s`<>)]*" % re.escape(host), text):
-                self.assertRegex(found.group(0), r"^%s(\?band=(42|XX))?$" % re.escape(url), "%s: not the address of the constant" % path)
-                if live:
-                    continue
-                self.assertEqual(text[found.start() - 1], "`", "%s: written as a link to click; it is a 404 today" % path)
-                paragraph = text[text.rfind("\n\n", 0, found.start()) + 2:text.find("\n\n", found.end())]
-                flat = re.sub(r"\s+", " ", paragraph)
-                self.assertRegex(flat, r"[Aa]t the event,? the QR code on (your|the) team card opens (this|the) same page online", path)
-                self.assertNotRegex(paragraph, r"^\s*\d+\. ", "%s: the hosted address is a numbered step" % path)
-                local = re.search(r"from your own computer|-m http\.server", text)
-                self.assertTrue(local and local.start() < found.start(), "%s: the hosted address comes before the local way" % path)
-        self.assertEqual(sorted(named_on), ["AGENTS.md", "README.md", "docs/getting-started.md"])
-        if not live:
-            guide = section(read("docs/getting-started.md"), "1. See your band working")
-            self.assertRegex(guide, r"(?s)^.*?\n1\. In the terminal, in `my-project/`, run:\n\n +python3 -m http\.server 8000 --bind 127\.0\.0\.1\n")
-            self.assertIn("3. Open <http://localhost:8000/vexo-open-kit/dashboard/?band=42>", guide)
-            self.assertNotIn("Scan the QR code", guide)
-            self.assertIn("never send the team there as a first step", read("AGENTS.md"))
-            self.assertIn('| The QR code on the card, or the online dashboard address, shows "404" or "not found" |', read("docs/getting-started.md"))
-        self.assertIn("`DASHBOARD_LIVE`", read("cards/README.md"))
+            for old in ("github.io", "QR code", "team card", "your card"):
+                self.assertNotIn(old.lower(), text.lower(), "%s still says %r" % (path, old))
+        self.assertFalse(os.path.exists(os.path.join(KIT, "cards")))
+        guide = section(read("docs/getting-started.md"), "1. See your band working")
+        self.assertRegex(guide, r"(?s)^.*?\n1\. In the terminal, in `my-project/`, run:\n\n +python3 -m http\.server 8000 --bind 127\.0\.0\.1\n")
+        self.assertIn("3. Open <http://localhost:8000/vexo-open-kit/dashboard/?band=42>", guide)
+        self.assertIn("Your band number is written on the bag", read("docs/getting-started.md"))
+        self.assertIn("the dashboard is opened from the team's own computer", read("AGENTS.md"))
+
+    def test_agents_may_only_ever_connect_to_the_teams_own_band(self):
+        agents = read("AGENTS.md")
+        rule = re.sub(r"\s+", " ", agents.split("\n### Only the team's own band: hard rules\n")[1].split("\nBand 7 is called")[0])
+        self.assertLess(agents.index("### Only the team's own band: hard rules"), agents.index("## Audio to text to AI"))
+        for words in ("You MUST ask for the team's band number before you write or run anything that connects.",
+                      "NEVER guess it, NEVER use 42",
+                      "use that one value in every connect, every scan and every dashboard address",
+                      "You MUST NEVER connect to, scan for, or send a command to any other band",
+                      "NEVER write code that scans without a filter on the exact name `Vexo-HACK-NN`",
+                      "NEVER write code that loops over band numbers",
+                      "disconnect at once, change nothing on that band, and tell the user",
+                      "you MUST NOT try another number",
+                      "You MUST refuse to connect to another team's band",
+                      "You MUST NEVER renumber a band"):
+            self.assertIn(words, rule)
+        self.assertEqual(len(re.findall(r"(?m)^\d\. ", agents.split("\n### Only the team's own band: hard rules\n")[1].split("\nBand 7 is called")[0])), 7)
+        # the calls the rule names exist, and a wrong band is refused by the library itself
+        from vexo_open.sync import Band
+        from vexo_open import VexoError
+        band = Band.connect(17, transport="sim")
+        self.assertEqual((band.number, band.name), (17, "Vexo-HACK-17"))
+        self.assertTrue(callable(band.set_band_number))
+        band.disconnect()
+        for page in ("README.md", "docs/getting-started.md"):
+            self.assertIn("someone else has connected to it: restart it and tell a helper", re.sub(r"\s+", " ", read(page)), page)
+
+    def test_42_is_called_an_example_at_the_top_of_every_page_with_commands(self):
+        flat = lambda page: re.sub(r"\s+", " ", read(page).replace("\n> ", " "))
+        for page in ("README.md", "docs/getting-started.md", "examples/README.md", "projects/README.md", "docs/deepgram.md",
+                     "docs/speech.md", "AGENTS.md"):
+            self.assertIn("**42 is only our example. Wherever you see 42 in a command, an address or a name, type the number "
+                          "written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address ends in `?band=7`.",
+                          flat(page), page)
+        self.assertIn("Never write 42 into a team's program", flat("AGENTS.md"))
 
     def test_the_web_server_is_always_started_for_this_computer_only(self):
         # Without --bind 127.0.0.1 the folder is served to everyone on the same network.
@@ -1277,7 +1291,7 @@ class Links(unittest.TestCase):
 
     def test_files_named_in_the_pages_exist(self):
         # `examples/python/led.py`, `js/src/`, `docs/api.md` ... written as code in the text
-        roots = ("docs/", "examples/", "js/", "python/", "dashboard/", "contract/", "cards/", "scripts/", ".githooks/")
+        roots = ("docs/", "examples/", "js/", "python/", "dashboard/", "contract/", "scripts/", ".githooks/")
         made_by_the_reader = set()
         for page in PAGES:
             for name in re.findall(r"`([\w./-]+)`", read(page)):

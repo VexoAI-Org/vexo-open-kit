@@ -9,7 +9,7 @@ files only when a task below points to them.
 
 Before you write any code, ask the team:
 
-> What is your band number? It is the XX in Vexo-HACK-XX on your band or card.
+> What is your band number? It is written on the bag your band came in (number 42 means the band is called Vexo-HACK-42).
 
 - Wait for the answer before you build anything. If you cannot ask (you run without a
   person, or as a helper of another agent), stop and hand the question back as your
@@ -19,13 +19,57 @@ Before you write any code, ask the team:
   or `7` from the examples in this kit into the team's code. This goes for the pretend
   band too: the number in the program is the team's number from the first line on.
 - Never connect to another number. Other teams are in the same room with their own bands.
+  `Band.connect(42)` looks only for the band called `Vexo-HACK-42`, and `?band=42` in the
+  dashboard address makes the browser's list show only that band.
+- When you write Bluetooth code yourself, without the kit's libraries, filter the scan by the
+  exact band name built from the team's band number (`Vexo-HACK-07` for 7), together with the
+  service UUID in `contract/contract.md`. Never connect to the first Vexo band the scan finds.
 - Keep the number in one place in the team's code (one constant or one command-line argument).
+- Never write 42 into a team's program. 42 is the example number on these pages: ask for the
+  team's band number and use that.
+
+### Only the team's own band: hard rules
+
+Once the team has told you their band number, these hold for everything you write and run.
+
+1. You MUST ask for the team's band number before you write or run anything that connects.
+   NEVER guess it, NEVER use 42, NEVER reuse a number from an example, a log or another
+   conversation.
+2. You MUST write the number down once in the team's project (one constant such as
+   `BAND = 17`, or one config value) and use that one value in every connect, every scan
+   and every dashboard address.
+3. You MUST NEVER connect to, scan for, or send a command to any other band: not the first
+   Vexo band found, not a band with a stronger signal, not a neighbour's band to test
+   whether it works, not a list of bands. NEVER write code that scans without a filter on
+   the exact name `Vexo-HACK-NN` for that number. NEVER write code that loops over band
+   numbers. NEVER use the "whatever is on the cable" form
+   (`Band.connect(None, transport="serial")`, in JavaScript
+   `Band.connect(null, { transport: 'serial' })`) in a team's program without checking that
+   `band.number` equals the team's number.
+4. After every connect you MUST check that the band's reported number is the team's
+   (`band.number`, `band.name`). `Band.connect(17)` does this by itself: it fails with code
+   `wrong-band` and closes the link. In code that does not use the library, or that
+   connected with `None` / `null`, check it yourself; if it is not the team's band,
+   disconnect at once, change nothing on that band, and tell the user.
+5. If the team's band cannot be found, you MUST NOT try another number. Tell the user to
+   double-tap their band (it can then be found for 60 seconds) and to check the number on
+   the bag. Use the pretend band (`--sim`) meanwhile.
+6. If the user asks to connect to a different band, first confirm that it is their own
+   team's band (a replacement), then change the one number. You MUST refuse to connect to
+   another team's band, and say why: other bands belong to other teams, and that band's
+   microphone and light would be taken over.
+7. You MUST NEVER renumber a band. Only the organisers change a band's number
+   (`SET_BAND_NUMBER`, `set_band_number`, `setBandNumber`).
 
 Band 7 is called `Vexo-HACK-07`, band 42 is `Vexo-HACK-42`, band 123 is `Vexo-HACK-123`.
 The library takes the plain number (`7`) and builds the name itself. Band numbers are 1 to
 999; 0 is not a band you can ask for.
 
 ## Audio to text to AI
+
+> **42 is only our example. Wherever you see 42 in a command, an address or a name, type the
+> number written on your band's bag.** Band 7 is `Vexo-HACK-07`, and its dashboard address
+> ends in `?band=7`.
 
 For the team and for the agent alike: how the band's microphone becomes text, and how an
 AI model makes sense of that text. Every command is typed in `my-project/`, the folder
@@ -245,11 +289,10 @@ all in `vexo-open-kit/examples/python/`, they are short:
 | `projects/` | Six small complete projects (reaction game, leash, clap lights, step diary, fall alarm, gesture trainer) that run on the pretend band and direct it. Not yet tried on a real band as whole projects (see below the table) | Look here FIRST, before you write from scratch, when the team wants a game, an alarm or a tracker, or anything else close to one of the six. Then start from it: copy the project's folder and `projects/shared` into `my-project/` ("Make one your own" in `projects/README.md`) |
 | `dashboard/` | Web page that shows one band's live data and controls its LED | The team wants to see the band working, or to check the band without your code |
 | `contract/contract.md` | The byte format of every command and data frame | Only for writing a client in another language (for USB, follow the checklist in its section 2.2), or to understand a raw error |
-| `cards/` | Generator for the printed team cards | The organisers' tool. Not needed for a project |
 | `js/src/`, `python/vexo_open/` | The libraries | Import them. Do not edit them |
 | `scripts/`, `.githooks/`, `*/test/`, `python/tests/` | Checks and tests for the kit | Run them (see the end). Do not edit them |
 
-Do not edit `js/`, `python/`, `contract/`, `dashboard/`, `cards/` or `scripts/`. They are the
+Do not edit `js/`, `python/`, `contract/`, `dashboard/` or `scripts/`. They are the
 kit. If something in them looks wrong, tell the team instead of changing it.
 
 What is tested on a real band, and what is not: the kit's features (the libraries, the
@@ -261,6 +304,12 @@ rest, the signal next to the laptop); the others are guesses. Each project's REA
 which. They will need tuning. Tell the team so when you start from a project.
 
 ## Where the team's code goes
+
+**Rule: the team's project is their own.** This kit is a reference, not a template and not the team's project. Write the team's code
+in the team's own project folder and repository (`my-project/`), never inside the kit
+folder. Do not treat the kit's examples and projects as the limit of what can be built:
+the team may build anything, in any language, with the band's motion, taps, light and
+microphone. The team's `.env` with its keys never goes into their repository.
 
 Put the project in the team's own folder, with the kit inside it, unchanged:
 
@@ -529,9 +578,7 @@ In `my-project/` run `python3 -m http.server 8000 --bind 127.0.0.1` (the same si
 server as for the team's own page), then open
 `http://localhost:8000/vexo-open-kit/dashboard/?band=XX` in Chrome or Edge, with the
 team's number in place of XX (`7`, `07` and `007` all mean band 7). This local address is
-the one to give the team. At the event the QR code on the team card opens the same page
-online (`https://vexoai-org.github.io/vexo-open-kit/?band=XX`); that address only works
-once the organisers have switched it on, so never send the team there as a first step.
+the one to give the team: the dashboard is opened from the team's own computer.
 The dashboard opened by double-click does nothing, and says so on the page after a second.
 Close the dashboard before running the team's program: the band takes one Bluetooth
 connection at a time, and a program on the USB cable would share the band with it (rule 7).
@@ -809,7 +856,7 @@ The rest of this section is for the kit's maintainers and for checking the kit i
 commands are typed from the kit folder (`my-project/vexo-open-kit`), not in `my-project/`
 (Python 3.9 or newer, Node 18 or newer, nothing to install):
 
-    node --test js/test/*.test.js cards/test/*.mjs dashboard/test/*.test.mjs examples/test/*.mjs
+    node --test js/test/*.test.js dashboard/test/*.test.mjs examples/test/*.mjs
     (cd python && python3 -m unittest discover -s tests)
     python3 -m unittest discover -s examples/test
     python3 -m unittest discover -s projects/test

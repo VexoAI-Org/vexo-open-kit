@@ -4,8 +4,6 @@ __pycache__/
 *.egg-info/
 .venv/
 .DS_Store
-cards/out/
-cards.html
 # keys, certificates, local settings, build output: never commit these
 *.pem
 *.key
